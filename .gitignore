@@ -1,6 +1,10 @@
 # ssl-multidomain-dataset
 dataset/*
 Dataset/
+Dataset/Benchmarks/WESAD/WESAD_train.pt
+Dataset/Benchmarks/WESAD_ECGonly/WESAD_ECGonly_train.pt
+Dataset/Benchmarks/**/*.pt
+
 
 
 # Byte-compiled / optimized / DLL files
