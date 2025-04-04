@@ -1,0 +1,1 @@
+{"fs": 360, "sig_len": 720, "n_sig": 1, "base_date": null, "base_time": null, "units": ["mV"], "sig_name": ["col 1"], "comments": [], "task": "Multiclass classification", "labels_code": ["1_Dangerous_VFL_VF", "2_Special_Form_VTTdP", "3_Threatening_VT", "4_Potential_Dangerous", "5_Supraventricular", "6_Sinus_rhythm"], "num_classes": 6}

@@ -1,0 +1,118 @@
+_wandb:
+    value:
+        cli_version: 0.19.9
+        m: []
+        python_version: 3.10.16
+        t:
+            "1":
+                - 1
+                - 5
+                - 53
+                - 55
+            "2":
+                - 1
+                - 5
+                - 53
+                - 55
+            "3":
+                - 2
+                - 17
+                - 23
+                - 24
+                - 55
+            "4": 3.10.16
+            "5": 0.19.9
+            "8":
+                - 5
+            "10":
+                - 3
+            "12": 0.19.9
+            "13": linux-x86_64
+head_model:
+    value:
+        Data_shape:
+            - 104845
+            - 1
+            - 720
+        Model_Type:
+            - Series2Vec
+        Norm: false
+        Training_mode: Pre_Training
+        batch_size: 64
+        console: false
+        data_dir: /home/adilson/Git/SSL-BRACIS-25/Series2Vec/Dataset/Benchmarks
+        dataset: Benchmarks
+        dim_ff: 256
+        dropout: 0.01
+        emb_size: 16
+        epochs: 600
+        gpu: 0
+        key_metric: accuracy
+        layers: 4
+        loss_module: NoFussCrossEntropyLoss()
+        lr: 0.001
+        num_heads: 8
+        num_labels: 5
+        optimizer: |-
+            RAdam (
+            Parameter Group 0
+                betas: (0.9, 0.999)
+                buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+                eps: 1e-08
+                lr: 0.001
+                weight_decay: 0
+            )
+        output_dir: Results/Pre_Training/Benchmarks/2025-03-29_07-38
+        pred_dir: Results/Pre_Training/Benchmarks/2025-03-29_07-38/predictions
+        print_interval: 10
+        problem: WESAD
+        rep_size: 320
+        save_dir: Results/Pre_Training/Benchmarks/2025-03-29_07-38/checkpoints
+        seed: 1234
+        tensorboard_dir: Results/Pre_Training/Benchmarks/2025-03-29_07-38/tb_summaries
+        val_interval: 2
+        val_ratio: 0.2
+s2v_ssl_model:
+    value:
+        Data_shape:
+            - 104845
+            - 1
+            - 720
+        Model_Type:
+            - Series2Vec
+        Norm: false
+        Training_mode: Pre_Training
+        batch_size: 64
+        console: false
+        data_dir: /home/adilson/Git/SSL-BRACIS-25/Series2Vec/Dataset/Benchmarks
+        dataset: Benchmarks
+        dim_ff: 256
+        dropout: 0.01
+        emb_size: 16
+        epochs: 600
+        gpu: 0
+        key_metric: accuracy
+        layers: 4
+        loss_module: NoFussCrossEntropyLoss()
+        lr: 0.001
+        num_heads: 8
+        num_labels: 5
+        optimizer: |-
+            RAdam (
+            Parameter Group 0
+                betas: (0.9, 0.999)
+                buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+                eps: 1e-08
+                lr: 0.001
+                weight_decay: 0
+            )
+        output_dir: Results/Pre_Training/Benchmarks/2025-03-29_07-38
+        pred_dir: Results/Pre_Training/Benchmarks/2025-03-29_07-38/predictions
+        print_interval: 10
+        problem: WESAD
+        rep_size: 320
+        save_dir: Results/Pre_Training/Benchmarks/2025-03-29_07-38/checkpoints
+        seed: 1234
+        tensorboard_dir: Results/Pre_Training/Benchmarks/2025-03-29_07-38/tb_summaries
+        val_interval: 2
+        val_ratio: 0.2

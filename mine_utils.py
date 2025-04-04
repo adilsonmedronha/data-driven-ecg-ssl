@@ -10,7 +10,7 @@ import os
 
 
 def plot_umap(embedding, train_labels, name, save_path="umap_plot.pdf"):
-    sns.set(style="whitegrid")  # Apply Seaborn styling
+    sns.set(style="whitegrid")
 
     fig, ax = plt.subplots(figsize=(10, 8))
     scatter = ax.scatter(embedding[:, 0], 
@@ -55,7 +55,6 @@ def umap_embedding(model, dataloader, device, head_model=None, mtype='ssl', name
 
     train_emb = torch.cat([torch.tensor(e) for e in train_emb], dim=0)
     train_labels = torch.cat([torch.tensor(l) for l in train_labels], dim=0)
-    # TODO SAVE THE EMBEDDING AS .pth file
     torch.save(train_emb, os.path.join(save_path, name + '.pth'))
     mapper = umap.UMAP(n_neighbors=5, 
                        min_dist=0.2,    
