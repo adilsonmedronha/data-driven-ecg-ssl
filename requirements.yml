@@ -1,4 +1,4 @@
-name: ssl
+name: ssl-multidomain
 channels:
   - conda-forge
   - defaults
@@ -190,4 +190,3 @@ dependencies:
       - webencodings==0.5.1
       - xarray==2025.3.0
       - xyzservices==2025.1.0
-prefix: /home/adilson/miniconda3/envs/ssl

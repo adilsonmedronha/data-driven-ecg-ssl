@@ -34,7 +34,7 @@ config = {
     "Training_mode": "Pre_Training",
     "batch_size": 64,
     "console": False,
-    "data_dir": "/home/adilson/Git/SSL-BRACIS-25/Series2Vec/Dataset/Benchmarks",
+    "data_dir": "./Dataset/Benchmarks",
     "dataset": "Benchmarks",
     "dim_ff": 256,
     "dropout": 0.01,
