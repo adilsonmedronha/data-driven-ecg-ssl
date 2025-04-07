@@ -20,3 +20,15 @@ dependencies:
   - tqdm=4.65
   - scipy
   - scikit-learn
+  - numba=0.61
+  - seaborn=0.13.2
+  - umap-learn=0.5.4
+  - tensorboard
+  - ipdb
+  - tabulate
+  - scikit-image
+  - wandb
+  - datashader 
+  - bokeh 
+  - holoviews 
+  - colorcet 
