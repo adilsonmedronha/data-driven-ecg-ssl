@@ -5,6 +5,13 @@ Dataset/Benchmarks/WESAD/WESAD_train.pt
 Dataset/Benchmarks/WESAD_ECGonly/WESAD_ECGonly_train.pt
 Dataset/Benchmarks/**/*.pt
 
+!Dataset/dataloader.py
+
+# temporary
+wandb/
+Results
+.vscode/
+summary
 
 
 # Byte-compiled / optimized / DLL files

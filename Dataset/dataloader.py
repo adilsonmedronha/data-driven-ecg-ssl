@@ -95,7 +95,7 @@ class dataset_class(Dataset):
     def __init__(self, data, label, config):
         super(dataset_class, self).__init__()
 
-        self.model_type = config['Model_Type'][0]
+        self.model_type = config['Model_Type']
         self.feature = data
         self.labels = label.astype(np.int32)
 

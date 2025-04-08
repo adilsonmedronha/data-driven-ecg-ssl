@@ -10,7 +10,6 @@
     "dim_ff": 256,
     "dropout": 0.01,
     "emb_size": 16,
-    "epochs": 600,
     "gpu": 0,
     "key_metric": "accuracy",
     "layers": 4,

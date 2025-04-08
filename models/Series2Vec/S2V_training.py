@@ -30,7 +30,7 @@ class BaseTrainer(object):
         self.model = model
         self.train_loader = train_loader
         self.test_loader = test_loader
-        self.device = config['device']
+        self.device = config['gpu']
         self.optimizer = config['optimizer']
         self.loss_module = config['loss_module']
         self.l2_reg = l2_reg

@@ -7,7 +7,8 @@ from torch.utils.data import Dataset
 
 from .ts2vec import TS2Vec
 
-
+def pre_training(config, Data):
+    pass
 
 def pretrain(train_data: Dataset, 
              val_data: Dataset,
