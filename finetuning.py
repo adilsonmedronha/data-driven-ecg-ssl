@@ -1,23 +1,20 @@
 import torch
+import argparse
 import os
-from models.Series2Vec import Series2Vec
+import json
 from models.Series2Vec.S2V_training import *
 from utils.utils import load_model
 from models.model_factory import Model_factory
 from Dataset import dataloader
 from models.optimizers import get_optimizer, get_loss_module
-from Dataset.dataloader import dataset_class
 from torch.utils.data import DataLoader
 from sklearn.metrics import confusion_matrix
-from typing import Any, Optional
 from models.heads.MLP import MLP
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 from datetime import datetime
 from torch.utils.data import DataLoader
 import wandb
-import umap.plot as uplot
-import umap
 import torch
 import torch.nn.functional as F
 import pandas as pd
@@ -25,73 +22,6 @@ from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
 from mine_utils import plot_umap, umap_embedding
-
-config = {
-    "Model_Type": [
-        "Series2Vec"
-    ],
-    "Norm": False,
-    "Training_mode": "Pre_Training",
-    "batch_size": 64,
-    "console": False,
-    "data_dir": "./Dataset/Benchmarks",
-    "dataset": "Benchmarks",
-    "dim_ff": 256,
-    "dropout": 0.01,
-    "emb_size": 16,
-    "epochs": 600,
-    "gpu": 0,
-    "key_metric": "accuracy",
-    "layers": 4,
-    "lr": 0.001,
-    "num_heads": 8,
-    "output_dir": "Results/Pre_Training/Benchmarks/2025-03-29_07-38",
-    "pred_dir": "Results/Pre_Training/Benchmarks/2025-03-29_07-38/predictions",
-    "print_interval": 10,
-    "rep_size": 320,
-    "save_dir": "Results/Pre_Training/Benchmarks/2025-03-29_07-38/checkpoints",
-    "seed": 1234,
-    "tensorboard_dir": "Results/Pre_Training/Benchmarks/2025-03-29_07-38/tb_summaries",
-    "val_interval": 2,
-    "val_ratio": 0.2
-}
-
-problem = os.listdir(config['data_dir'])
-config['problem'] = problem[1]
-path2load_encoder = os.path.join(config['save_dir'], config['problem'] + '_pretrained_model_{}.pth'.format('last'))
-
-DataWhereS2VwereTrained = dataloader.data_loader(config)
-model = Model_factory(config, DataWhereS2VwereTrained)
-optim_class = get_optimizer("RAdam")
-config['optimizer'] = optim_class(model.parameters(), lr=config['lr'], weight_decay=0)
-config['loss_module'] = get_loss_module()
-model.to(config['gpu'])
-
-SS_Encoder, optimizer, start_epoch = load_model(model, path2load_encoder, config['optimizer'])  # Loading the model
-SS_Encoder.to(config['gpu'])
-
-train = torch.load('Dataset/Fragment/ecg-fragment_360hz/train.pt')
-test = torch.load('Dataset/Fragment/ecg-fragment_360hz/test.pt')
-val = torch.load('Dataset/Fragment/ecg-fragment_360hz/val.pt')
-
-ytrain = train['labels']
-ytest = test['labels']
-yval = val['labels']
-
-xtrain = train['samples']
-xtest = test['samples']
-xval = val['samples']
-
-train_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=32, shuffle=True)
-test_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=32, shuffle=True)
-val_loader = DataLoader(TensorDataset(xval, yval), batch_size=32, shuffle=True)
-
-
-wandb.init()
-RUN_NAME = "ssl_retraining_and_mlp_as_head"
-HEAD_TYPE = "mlp"
-wandb.run.name = RUN_NAME
-wandb.run.save()
 
 
 
@@ -133,7 +63,6 @@ def val(head_model, ssl_model, val_loader: DataLoader, loss_module, device='cuda
     
     avg_val_loss = sum(val_loss) / len(val_loss)
     return avg_val_loss
-
 
 def test(head_model, ssl_model, test_loader, loss_module, device, save_path):
     head_model.eval()
@@ -179,30 +108,26 @@ def test(head_model, ssl_model, test_loader, loss_module, device, save_path):
     plt.close()
     return results
 
-def run(run_idx, head_model, 
+def run(run_idx, epochs, head_model, 
         ssl_model, 
         head_optimizer, 
         ssl_optimizer, loss_module, train_loader, val_loader, head_config, ssl_config, save_path, is_full_training=False):
     
     print(head_config.get('wandb_project', 'default_project'))
-    #wandb.init(project='ssl_finetuning', entity='adilson', config=config)
-    #wandb.config.update(config)
     best_val_loss = float('inf')
-    best_model = None
     device = head_config['gpu']
-    EPOCHS = 2
 
     umap_ssl_emb_before, train_labels = umap_embedding(ssl_model, train_loader, device, mtype='ssl', name = 'UMAP_ssl_emb_before', save_path=save_path)
     fig_umap_before = plot_umap(umap_ssl_emb_before, 
                                 train_labels, 
                                 name = f"UMAP SSL BEFORE {RUN_NAME}",
                                 save_path=os.path.join(save_path, f"UMAP_ssl_before_{RUN_NAME}.pdf"))
-    for epoch in range(EPOCHS): 
+    for epoch in range(epochs): 
         train_loss = train(head_model, ssl_model, head_optimizer, ssl_optimizer, loss_module, train_loader, device, is_full_training)
         val_loss = val(head_model, ssl_model, val_loader, loss_module, device)
         
         wandb.log({f'{run_idx}_Loss/train': train_loss, f'{run_idx}_Loss/val': val_loss, 'epoch': epoch})
-        print(f'Epoch: {epoch+1}/{EPOCHS}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
+        print(f'Epoch: {epoch+1}/{epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
     
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -239,53 +164,99 @@ def run(run_idx, head_model,
 
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config_file', type=str, help='Path to the configuration file', required=True)
+    parser.add_argument('--runs', type=int, default=5, help='Number of runs for the experiment')
+    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train the head model')
+
+    args = parser.parse_args()
+
+    with open(args.config_file, 'r') as f:
+        config = json.load(f)
+
+
+    # ------------------------------------------------- Load SSL model -------------------------------------------------
+    problem = os.listdir(config['data_dir'])
+    config['problem'] = problem[1]
+    path2load_encoder = os.path.join(config['save_dir'], config['problem'] + '_pretrained_model_{}.pth'.format('last'))
+
+    DataWhereS2VwereTrained = dataloader.data_loader(config)
+    model = Model_factory(config, DataWhereS2VwereTrained)
+    optim_class = get_optimizer("RAdam")
+    config['optimizer'] = optim_class(model.parameters(), lr=config['lr'], weight_decay=0)
+    config['loss_module'] = get_loss_module()
+    model.to(config['gpu'])
+
+    SS_Encoder, optimizer, start_epoch = load_model(model, path2load_encoder, config['optimizer'])  # Loading the model
+    SS_Encoder.to(config['gpu'])
+
+    # ------------------------------------------------- Load Head model -------------------------------------------------
     in_dim = 640 
     mlp = MLP(640, 128, 6)
     device = config['gpu']
     mlp.to(device)
     adam_optimizer = torch.optim.Adam(mlp.parameters(), lr=0.00001)
     criterion = nn.CrossEntropyLoss()
-    N_EXPERIMENTS = 5
+    N_EXPERIMENTS = args.runs
 
-    RUN_NAME = "ssl_retraining_and_mlp_as_head"
+    # ----------------------------------------------- Load Target dataset -----------------------------------------------
+    train_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/train.pt')
+    test_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/test.pt')
+    val_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/val.pt')
+
+    x_train_data, y_train_data = train_data['samples'], train_data['labels']
+    x_test_data, y_test_data = test_data['samples'], test_data['labels']
+    x_val_data, y_val_data = val_data['samples'], val_data['labels']
+
+    train_loader = DataLoader(TensorDataset(x_train_data, y_train_data), batch_size=32, shuffle=True)
+    test_loader = DataLoader(TensorDataset(x_test_data, y_test_data), batch_size=32, shuffle=True)
+    val_loader = DataLoader(TensorDataset(x_val_data, y_val_data), batch_size=32, shuffle=True)
+
+    # ----------------------------------------------- Configure the Wandb -----------------------------------------------
+    wandb.init()
+    RUN_NAME = f"{config['Model_Type']}_as_ssl_and_mlp_as_head"
     HEAD_TYPE = "mlp"
+    wandb.run.name = RUN_NAME
+    wandb.run.save()
 
+    # ------------------------------------------------ Create output dir ------------------------------------------------
     initial_timestamp = datetime.now()
     output_dir = os.path.join("Results", "Pos_training", initial_timestamp.strftime("%Y-%m-%d_%H-%M"))
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
 
-    # config = {'head_model': head_config, 's2v_ssl_model': ssl_config}
-    
-
     df = pd.DataFrame(columns=["model", "dataset", "exp", "avg loss", "acc", "f1", "recall", "precision"])
     csv_path = os.path.join(output_dir, "results.csv")
     df.to_csv(csv_path, mode='a', header=True, index=False)
 
+    # ----------------------------------------------- Run the experiment -----------------------------------------------
     wandb.init(project='ssl_finetuning', entity='adilson', config=config)
     wandb.config.update({'head_model': config, 's2v_ssl_model': config})
     models = []
     for run_idx in range(N_EXPERIMENTS):
-        train_results = run(run_idx, head_model = mlp, 
-            ssl_model = SS_Encoder, 
-            head_optimizer = adam_optimizer, 
-            ssl_optimizer= config['optimizer'],
-            loss_module = criterion,
-            train_loader = train_loader, 
-            val_loader = val_loader, 
-            head_config = config,
-            ssl_config = config,
-            save_path = output_dir,
-            is_full_training = True)
+        train_results = run(run_idx, 
+                            epochs= args.epochs,
+                            head_model = mlp, 
+                            ssl_model = SS_Encoder, 
+                            head_optimizer = adam_optimizer, 
+                            ssl_optimizer= config['optimizer'],
+                            loss_module = criterion,
+                            train_loader = train_loader, 
+                            val_loader = val_loader, 
+                            head_config = config,
+                            ssl_config = config,
+                            save_path = output_dir,
+                            is_full_training = True)
         models.append(train_results)
 
         # TODO nome do experiment no wandb
-        results = test(head_model = mlp, 
-                            ssl_model = SS_Encoder, 
-                            test_loader = test_loader, 
-                            loss_module = criterion,
-                            device = device,
-                            save_path = output_dir)
+        results = test(head_model = mlp,
+                       ssl_model = SS_Encoder, 
+                       test_loader = test_loader, 
+                       loss_module = criterion,
+                       device = device,
+                       save_path = output_dir)
         
         df = pd.DataFrame({
             "model": [RUN_NAME],
@@ -300,7 +271,7 @@ if __name__ == '__main__':
 
         df.to_csv(csv_path, mode='a', header = not pd.io.common.file_exists(csv_path), index=False)
 
-
+    # save the best model
     best_ssl_and_head = min(models, key=lambda x: x['val_loss'])
     torch.save(best_ssl_and_head['head_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_best_head_model_across_all_loss_validation.pth'))
     torch.save(best_ssl_and_head['ssl_model'].state_dict(),  os.path.join(output_dir, f'{RUN_NAME}_ssl_model.pth'))

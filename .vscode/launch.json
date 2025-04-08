@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Finetuning Script",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/finetuning.py",
+      "console": "integratedTerminal",
+      "args": [
+        "--config_file",
+        "${workspaceFolder}/Configs/SSL_series2vec.json"
+      ]
+    }
+  ]
+}

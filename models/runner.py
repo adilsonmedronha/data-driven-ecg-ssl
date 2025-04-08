@@ -18,7 +18,7 @@ logger = logging.getLogger('__main__')
 
 
 def choose_trainer(model, train_loader, test_loader, config, conf_mat, type):
-    if config['Model_Type'][0] == 'Series2Vec':
+    if config['Model_Type'] == 'Series2Vec':
         S_trainer = S2V_S_Trainer(model, train_loader, test_loader, config, print_conf_mat=conf_mat)
     return S_trainer
 

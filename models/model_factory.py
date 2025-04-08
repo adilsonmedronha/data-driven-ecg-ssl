@@ -13,12 +13,12 @@ def Model_factory(config, data):
     config['Data_shape'] = data['train_data'].shape
     config['num_labels'] = int(max(data['train_label'])) + 1
 
-    if config['Model_Type'][0] == 'Series2Vec':
+    if config['Model_Type'] == 'Series2Vec':
         model = Series2Vec.Seires2Vec(config, num_classes=config['num_labels'])
     '''
-    if config['Model_Type'][0] == 'TS_TCC':
+    if config['Model_Type'] == 'TS_TCC':
         model = TS_TCC.TS_TCC(config, num_classes=config['num_labels'])
-    if config['Model_Type'][0] == 'TF_C':
+    if config['Model_Type'] == 'TF_C':
         model = TF_C.TF_C(config, num_classes=config['num_labels'])
     '''
 
