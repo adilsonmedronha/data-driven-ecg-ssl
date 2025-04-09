@@ -43,8 +43,8 @@ if __name__ == '__main__':
             Data = dataloader.data_loader(config)
             TS2Vec_pre_training(config, Data)
 
-    
 
+    # TODO: save the final configs
 
 
     print('Pretraining completed.')

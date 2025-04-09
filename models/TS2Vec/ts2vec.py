@@ -102,15 +102,12 @@ class TS2Vec:
 
 
     def fit_ssl(self, 
-                train_data: np.ndarray, 
-                val_data: np.ndarray, 
+                train_data: DataLoader, 
+                val_data: DataLoader, 
                 optimizer: Optimizer, 
-                batch_size: int, 
-                n_epochs: int,
+                config: dict,
                 temporal_unit: Optional[int] = 0, 
-                max_train_length: Optional[int] = None, 
-                save_temp: Optional[bool] = True,
-                checkpoint: dict = None
+                resume_train: Optional[bool] = False,
                 ):
         ''' Training the TS2Vec model.
         
@@ -130,49 +127,36 @@ class TS2Vec:
         '''
         self.to(self.device)
 
-        if save_temp:
-            temp_dir = Path(".temporary")
-            os.makedirs(temp_dir, exist_ok=True)
+        # create the dir to save the checkpoints
+        checkpoint_path = f"{config['save_dir']}/{config['problem']}_pretrained_TS2Vec_last.pth"
+        if not os.path.isdir(config['save_dir']):
+            os.makedirs(config['save_dir'])
 
-        assert train_data.ndim == 3
-        
-        if max_train_length is not None:
-            sections = train_data.shape[1] // max_train_length
-            if sections >= 2:
-                train_data = np.concatenate(split_with_nan(train_data, sections, axis=1), axis=0)
+        # Resume the training stoped
+        if resume_train:
+            checkpoint = torch.load(checkpoint_path, weights_only=True)
+            self.load_state_dict(checkpoint['state_dict']) 
 
-        temporal_missing = np.isnan(train_data).all(axis=-1).any(axis=0)
-        if temporal_missing[0] or temporal_missing[-1]:
-            train_data = centerize_vary_length_series(train_data)
-        
-        train_data = train_data[~np.isnan(train_data).all(axis=2).all(axis=1)]
-        
-        train_dataset = TensorDataset(torch.from_numpy(train_data).to(torch.float))
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-
-        val_dataset = TensorDataset(torch.from_numpy(val_data).to(torch.float))
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-        
         train_losses = []
         val_losses = []
 
         best_loss = torch.inf
+        best_epoch = None
         best_model_params = None
         
-        start_epoch = 0 if checkpoint is None else checkpoint['epoch']
-        for i in range(start_epoch, n_epochs):
+        start_epoch = 0 if resume_train is False else checkpoint['epoch']-1
+        for i in range(start_epoch, config['epochs']):
 
             # ---------------- Training phase ---------------- #
             self.train()
             running_loss = 0
 
-            batch_iter = tqdm(train_loader, desc=f"{i+1:2.0f}/{n_epochs}", total=len(train_loader))
+            batch_iter = tqdm(train_data, desc=f"{i+1:2.0f}/{config['epochs']}", total=len(train_data))
             for batch in batch_iter:
-                x = batch[0]
-                if max_train_length is not None and x.size(1) > max_train_length:
-                    window_offset = np.random.randint(x.size(1) - max_train_length + 1)
-                    x = x[:, window_offset : window_offset + max_train_length]
-                x = x.to(self.device)
+                x = batch[0].to(self.device)
+                # if max_train_length is not None and x.size(1) > max_train_length:
+                #     window_offset = np.random.randint(x.size(1) - max_train_length + 1)
+                #     x = x[:, window_offset : window_offset + max_train_length]
                 
                 optimizer.zero_grad()
 
@@ -198,14 +182,14 @@ class TS2Vec:
                     self.after_iter_callback(self, loss.item())
             
 
-            running_loss /= len(train_loader)
+            running_loss /= len(train_data)
             train_losses.append(running_loss)
 
             # ---------------- Evaluation phase ---------------- #
             self.eval()
             running_loss = 0
             with torch.no_grad():
-                for batch in val_loader:
+                for batch in val_data:
                     x = batch[0].to(self.device)
 
                     crop_l = np.random.randint(low=2 ** (temporal_unit + 1), high=x.size(1)+1)
@@ -223,30 +207,32 @@ class TS2Vec:
 
 
             # -------------- Save checkpoint -------------- #
-            if temp_dir:
-                checkpoint = {
-                    'model': self.net.state_dict(),
-                    'epoch': i+1
-                }
-                torch.save(checkpoint, temp_dir / "checkpoint.pt")
+            checkpoint = {'state_dict': self.net.state_dict(), 'epoch': i+1}
+            torch.save(checkpoint, checkpoint_path)
 
-            running_loss /= len(val_loader)
+            running_loss /= len(val_data)
             if running_loss < best_loss:
                 best_loss = running_loss
                 best_model_params = self.net.state_dict()
+                best_epoch = i+1
+
+                checkpoint = {'state_dict': best_model_params, 'epoch': best_epoch}
+                torch.save(checkpoint, f"{config['save_dir']}/{config['problem']}_pretrained_TS2Vec_best.pth")
 
             val_losses.append(running_loss)
-            
-
             print(f"[Train: {train_losses[-1]:.4f} | Val: {val_losses[-1]:.4f}]")
 
             if self.after_epoch_callback is not None:
                 self.after_epoch_callback(self, running_loss)
         
         self.cpu()
-        losses = {'train_losses': train_losses, 'val_losses': val_losses}
+        logs = {
+            'train_losses': train_losses, 
+            'val_losses': val_losses,
+            'best_epoch': best_epoch
+        }
 
-        return best_model_params, losses
+        return best_model_params, logs
 
 
     def _extract_context_view(self, x, crop_len):
