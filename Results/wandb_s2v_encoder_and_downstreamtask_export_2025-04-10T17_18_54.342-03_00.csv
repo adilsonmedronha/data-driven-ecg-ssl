@@ -1,0 +1,65 @@
+"Name","State","Notes","User","Tags","Created","Runtime","Sweep","head_model.Description","head_model.RUN_NAME","head_model.Training_mode","head_model.batch_size","head_model.data_dir","head_model.dataset","head_model.dropout","head_model.epochs","head_model.gpu","head_model.is_linear_probing","head_model.key_metric","head_model.layers_config","head_model.lr","head_model.n_runs","head_model.seed","s2v_ssl_model.Data_shape","s2v_ssl_model.Model_Type","s2v_ssl_model.Norm","s2v_ssl_model.Training_mode","s2v_ssl_model.batch_size","s2v_ssl_model.console","s2v_ssl_model.data_dir","s2v_ssl_model.dataset","s2v_ssl_model.dim_ff","s2v_ssl_model.dropout","s2v_ssl_model.emb_size","s2v_ssl_model.epochs","s2v_ssl_model.gpu","s2v_ssl_model.key_metric","s2v_ssl_model.layers","s2v_ssl_model.loss_module","s2v_ssl_model.lr","s2v_ssl_model.model_path","s2v_ssl_model.num_heads","s2v_ssl_model.num_labels","s2v_ssl_model.optimizer","s2v_ssl_model.output_dir","s2v_ssl_model.pred_dir","s2v_ssl_model.print_interval","s2v_ssl_model.problem","s2v_ssl_model.rep_size","s2v_ssl_model.save_dir","s2v_ssl_model.seed","s2v_ssl_model.tensorboard_dir","s2v_ssl_model.val_interval","s2v_ssl_model.val_ratio","0_Loss/train","0_Loss/val","1_Loss/train","1_Loss/val","2_Loss/train","2_Loss/val","3_Loss/train","3_Loss/val","4_Loss/train","4_Loss/val","epoch","step/run_0","step/run_1","step/run_2","step/run_3","step/run_4","step/run_5","step/run_6","step/run_7","step/run_8","step/run_9","train_loss/run_0","train_loss/run_1","train_loss/run_2","train_loss/run_3","train_loss/run_4","train_loss/run_5","train_loss/run_6","train_loss/run_7","train_loss/run_8","train_loss/run_9","val_loss/run_0","val_loss/run_1","val_loss/run_2","val_loss/run_3","val_loss/run_4","val_loss/run_5","val_loss/run_6","val_loss/run_7","val_loss/run_8","val_loss/run_9"
+"FCN_finetuning_and_one_domain","finished","-","","","2025-04-10T17:12:20.000Z","449","","","","","64","","Fragment","0.01","","0","","accuracy","[1,6]","0.0001","","1234","[104845,1,720]","Series2Vec","false","Pre_Training","64","false","Dataset/Benchmarks","Benchmarks","256","0.01","16","600","0","accuracy","4","NoFussCrossEntropyLoss()","0.001","","8","5","RAdam (
+Parameter Group 0
+    betas: (0.9, 0.999)
+    buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+    eps: 1e-08
+    lr: 0.001
+    weight_decay: 0
+)","","","","WESAD","320","","1234","Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries","2","0.2","","","","","","","","","","","","299","299","299","299","299","","","","","","1.5731864734129473","1.5923516750335691","1.580050966956399","1.5973188118501145","1.5795513824983076","","","","","","1.5649115145206451","1.5725102126598358","1.5815450549125671","1.5853027999401093","1.5681397020816803","","","","",""
+"FCN_linearprobing_and_one_domain","finished","-","","","2025-04-10T17:06:41.000Z","325","","","","","64","","Fragment","0.01","","0","","accuracy","[1,6]","0.0001","","1234","[104845,1,720]","Series2Vec","false","Pre_Training","64","false","Dataset/Benchmarks","Benchmarks","256","0.01","16","600","0","accuracy","4","NoFussCrossEntropyLoss()","0.001","","8","5","RAdam (
+Parameter Group 0
+    betas: (0.9, 0.999)
+    buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+    eps: 1e-08
+    lr: 0.001
+    weight_decay: 0
+)","","","","WESAD","320","","1234","Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries","2","0.2","","","","","","","","","","","","299","299","299","299","299","","","","","","1.5800299752842295","1.587174740704623","1.5682681148702449","1.577861417423595","1.5696986263448542","","","","","","1.5933323502540588","1.6036275327205658","1.603674054145813","1.5967677533626556","1.5951825976371763","","","","",""
+"FCN_finetuning_and_four_domains","finished","-","","","2025-04-10T16:58:50.000Z","456","","","","","64","","Fragment","0.01","","0","","accuracy","[1,6]","0.0001","","1234","[104845,1,720]","Series2Vec","false","Pre_Training","64","false","Dataset/Benchmarks","Benchmarks","256","0.01","16","600","0","accuracy","4","NoFussCrossEntropyLoss()","0.001","","8","5","RAdam (
+Parameter Group 0
+    betas: (0.9, 0.999)
+    buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+    eps: 1e-08
+    lr: 0.001
+    weight_decay: 0
+)","","","","WESAD","320","","1234","Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries","2","0.2","","","","","","","","","","","","299","299","299","299","299","","","","","","1.560088276863098","1.5936206687580456","1.5627137530933728","1.5858571421016343","1.6027259501543911","","","","","","1.564460277557373","1.576252520084381","1.5407028794288635","1.5703816413879397","1.576408863067627","","","","",""
+"FCN_linearprobing_and_four_domains","finished","-","","","2025-04-10T16:53:06.000Z","329","","","","","64","","Fragment","0.01","","0","","accuracy","[1,6]","0.0001","","1234","[104845,1,720]","Series2Vec","false","Pre_Training","64","false","Dataset/Benchmarks","Benchmarks","256","0.01","16","600","0","accuracy","4","NoFussCrossEntropyLoss()","0.001","","8","5","RAdam (
+Parameter Group 0
+    betas: (0.9, 0.999)
+    buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+    eps: 1e-08
+    lr: 0.001
+    weight_decay: 0
+)","","","","WESAD","320","","1234","Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries","2","0.2","","","","","","","","","","","","299","299","299","299","299","","","","","","1.3966467055407437","1.4670326818119397","1.4440338882532986","1.47537962956862","1.383715564554388","","","","","","1.5608605444431305","1.575394570827484","1.5711296498775482","1.5348857939243317","1.5733902156352997","","","","",""
+"MLP_finetuning_and_one_domain","finished","-","","","2025-04-10T16:48:46.000Z","246","","","","","64","","Fragment","0.01","","0","","accuracy","[640,128,6]","0.0001","","1234","[104845,1,720]","Series2Vec","false","Pre_Training","64","false","Dataset/Benchmarks","Benchmarks","256","0.01","16","600","0","accuracy","4","NoFussCrossEntropyLoss()","0.001","","8","5","RAdam (
+Parameter Group 0
+    betas: (0.9, 0.999)
+    buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+    eps: 1e-08
+    lr: 0.001
+    weight_decay: 0
+)","","","","WESAD","320","","1234","Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries","2","0.2","","","","","","","","","","","","299","299","299","299","299","","","","","","1.3403425406325946","1.2866407172246412","1.2524912032214075","1.2133751227097078","1.2627154669978402","","","","","","1.7818615436553955","1.761381596326828","1.8390535414218905","1.906612813472748","1.7704009115695951","","","","",""
+"MLP_linearprobing_and_one_domain","finished","-","","","2025-04-10T16:46:33.000Z","118","","","","","64","","Fragment","0.01","","0","","accuracy","[640,128,6]","0.0001","","1234","[104845,1,720]","Series2Vec","false","Pre_Training","64","false","Dataset/Benchmarks","Benchmarks","256","0.01","16","600","0","accuracy","4","NoFussCrossEntropyLoss()","0.001","","8","5","RAdam (
+Parameter Group 0
+    betas: (0.9, 0.999)
+    buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+    eps: 1e-08
+    lr: 0.001
+    weight_decay: 0
+)","","","","WESAD","320","","1234","Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries","2","0.2","","","","","","","","","","","","299","299","299","299","299","","","","","","1.351089439608834","1.3629221265966245","1.414882237260992","1.4079007343812422","1.3696899034760217","","","","","","1.3598693013191223","1.3496666550636292","1.3335295021533966","1.3410294353961945","1.3315383195877075","","","","",""
+"MLP_finetuning_and_four_domains","finished","-","","","2025-04-10T16:42:22.000Z","237","","","","","64","","Fragment","0.01","","0","","accuracy","[640,128,6]","0.0001","","1234","[104845,1,720]","Series2Vec","false","Pre_Training","64","false","Dataset/Benchmarks","Benchmarks","256","0.01","16","600","0","accuracy","4","NoFussCrossEntropyLoss()","0.001","","8","5","RAdam (
+Parameter Group 0
+    betas: (0.9, 0.999)
+    buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+    eps: 1e-08
+    lr: 0.001
+    weight_decay: 0
+)","","","","WESAD","320","","1234","Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries","2","0.2","","","","","","","","","","","","299","299","299","299","299","","","","","","1.1432578292759985","1.1375385251912205","1.1204502745108171","1.1686044281179255","1.242858501997861","","","","","","1.987814575433731","1.9453597962856293","1.9798115491867063","1.961618036031723","1.9718292951583865","","","","",""
+"MLP_linearprobing_and_four_domains","finished","-","","","2025-04-10T16:40:12.000Z","115","","","","","64","","Fragment","0.01","","0","","accuracy","[640,128,6]","0.0001","","1234","[104845,1,720]","Series2Vec","false","Pre_Training","64","false","Dataset/Benchmarks","Benchmarks","256","0.01","16","600","0","accuracy","4","NoFussCrossEntropyLoss()","0.001","","8","5","RAdam (
+Parameter Group 0
+    betas: (0.9, 0.999)
+    buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+    eps: 1e-08
+    lr: 0.001
+    weight_decay: 0
+)","","","","WESAD","320","","1234","Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries","2","0.2","","","","","","","","","","","","299","299","299","299","299","","","","","","1.1384310559792952","1.1282764727419072","1.1482694311575457","1.1748227314515547","1.1782222932035271","","","","","","1.145095907151699","1.1457268446683884","1.1083733886480331","1.1331297270953655","1.1491393111646175","","","","",""

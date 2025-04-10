@@ -1,0 +1,62 @@
+{
+  "os": "Linux-6.8.0-55-generic-x86_64-with-glibc2.39",
+  "python": "CPython 3.10.16",
+  "startedAt": "2025-04-09T22:24:48.232538Z",
+  "args": [
+    "--model_name",
+    "MLP",
+    "--description",
+    "MLP_linearprobing_and_four_domains",
+    "--head_configuration_file",
+    "Configs/MLP_headmodel.json",
+    "--encoder_configuration_file",
+    "Configs/SSL_encoder_S2V.json",
+    "--encoder_checkpoint_path",
+    "Results/Pre_Training/S2V/2025-03-29_07-38/checkpoints/WESAD_pretrained_model_last.pth",
+    "--epochs",
+    "10",
+    "--runs",
+    "5",
+    "--is_finetuning",
+    "0",
+    "--seed",
+    "10"
+  ],
+  "program": "/home/adilson/Git/ssl/finetuning.py",
+  "codePath": "finetuning.py",
+  "git": {
+    "remote": "https://github.com/adilsonmedronha/ssl.git",
+    "commit": "9e200e3484f64df3be0c2f528021819384aaa282"
+  },
+  "email": "ad.medronha@gmail.com",
+  "root": "/home/adilson/Git/ssl",
+  "host": "labic-gamer",
+  "executable": "/home/adilson/miniconda3/envs/ssl/bin/python",
+  "codePathLocal": "finetuning.py",
+  "cpu_count": 8,
+  "cpu_count_logical": 16,
+  "gpu": "NVIDIA GeForce RTX 3060",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "1006450962432",
+      "used": "882423099392"
+    }
+  },
+  "memory": {
+    "total": "16658464768"
+  },
+  "cpu": {
+    "count": 8,
+    "countLogical": 16
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 3060",
+      "memoryTotal": "12884901888",
+      "cudaCores": 3584,
+      "architecture": "Ampere"
+    }
+  ],
+  "cudaVersion": "12.4"
+}
