@@ -1,5 +1,4 @@
 import numpy as np
-from typing import Optional
 from datetime import datetime
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -19,6 +18,7 @@ def pre_training(config, data, resume_train = False):
     Args:
         data (dict): Train dataset.
         config (dict): Trainig configuration.
+        resume_train (bool): Resume training from a checkpoint. Default = False.
 
     Returns:
         pretrained TS2Vec params (dict), training logs (dict)
@@ -42,17 +42,16 @@ def pre_training(config, data, resume_train = False):
     ts2vec_optim = optim.AdamW(ts2vec._net.parameters(), **config['optim_args'])
 
     since = datetime.now()
-    ts2vec_params, logs = ts2vec.fit_ssl(train_loader, 
-                                         test_loader,
-                                         ts2vec_optim, 
-                                         config,
-                                         resume_train,
-                                         )
+    _, logs = ts2vec.fit_ssl(train_loader=train_loader, 
+                                         val_loader=test_loader,
+                                         optimizer=ts2vec_optim, 
+                                         config=config,
+                                         resume_train=resume_train)
     ssl_time = datetime.now() - since
     logs['time'] = ssl_time.total_seconds()
 
-    print(f"Best validation loss: {logs['val_losses'][logs['best_epoch']-1]}")
-    print(f"Saving best model for epoch: {logs['best_epoch']}\n")
-
-    print(f"\nFinished! Training time {ssl_time}")
-    return ts2vec_params, logs
+    logger.info(f"Best validation loss: {logs['val_losses'][logs['best_epoch']-1]}")
+    logger.info(f"Saved best model, the model from epoch {logs['best_epoch']}\n")
+    logger.info(f"\nFinished! Training time {ssl_time}")
+    
+    return config, logs

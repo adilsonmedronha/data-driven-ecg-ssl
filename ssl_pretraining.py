@@ -41,7 +41,17 @@ if __name__ == '__main__':
             print(problem)
             
             Data = dataloader.data_loader(config)
-            TS2Vec_pre_training(config, Data)
+            updated_config, logs = TS2Vec_pre_training(config, Data)
+
+            # Save the configs to a file ---------------------------------------------------
+            logs_path = os.path.join(config['save_dir'], config['problem']+'_logs.json')
+            config_path = os.path.join(config['save_dir'], config['problem']+'_config.json')
+
+            json.dump(logs, open(logs_path, 'w'))
+            print(f"Logs saved to {logs_path}")
+
+            json.dump(updated_config, open(config_path, 'w'))
+            print(f"Config saved to {config_path}")
 
 
     # TODO: save the final configs
