@@ -2,7 +2,6 @@ import os
 import numpy as np
 from tqdm import tqdm
 from typing import Optional
-from pathlib import Path
 
 import torch
 import torch.nn.functional as F
@@ -11,7 +10,7 @@ from torch.utils.data import TensorDataset, DataLoader
 
 from .encoder import TSEncoder
 from .losses import hierarchical_contrastive_loss
-from .utils import take_per_row, split_with_nan, centerize_vary_length_series, torch_pad_nan
+from .utils import take_per_row, torch_pad_nan
 
 
 class TS2Vec:
@@ -102,27 +101,22 @@ class TS2Vec:
 
 
     def fit_ssl(self, 
-                train_data: np.ndarray, 
-                val_data: np.ndarray, 
+                train_loader: DataLoader, 
+                val_loader: DataLoader, 
                 optimizer: Optimizer, 
-                batch_size: int, 
-                n_epochs: int,
+                config: dict,
                 temporal_unit: Optional[int] = 0, 
-                max_train_length: Optional[int] = None, 
-                save_temp: Optional[bool] = True,
-                checkpoint: dict = None
+                resume_train: Optional[bool] = False,
                 ):
         ''' Training the TS2Vec model.
         
         Args:
-            train_data (numpy.ndarray): The training data. It should have a shape of (n_instance, n_timestamps, n_features). All missing data should be set to NaN.
-            val_data (numpy.ndarray): The validation data. It should have a shape of (n_instance, n_timestamps, n_features).
+            train_loader (DataLoader): The training data. It should have a shape of (n_instance, n_timestamps, n_features). All missing data should be set to NaN.
+            val_loader (DataLoader): The validation data. It should have a shape of (n_instance, n_timestamps, n_features).
             optimizer (Optimizer): Model optimizer.
-            batch_size (int): Size of the batch.
-            n_epochs (int): The number of epochs. When this reaches, the training stops.
-            temporal_unit (int): The minimum unit to perform temporal contrast. When training on a very long sequence, this param helps to reduce the cost of time and memory.
-            max_train_length (int, optional): The maximum allowed sequence length for training. For sequence with a length greater than <max_train_length>, it would be cropped into some sequences, each of which has a length less than <max_train_length>.
-            save_temp (bool): Save the partially trained model after each epoch. Default = True.
+            config (dict): The training configuration. It should contain the following keys: 'save_dir', 'problem', 'epochs'.
+            temporal_unit (Optional, int): The minimum unit to perform temporal contrast. When training on a very long sequence, this param helps to reduce the cost of time and memory.
+            resume_train (Optional, bool): Resume the training from the last checkpoint. Default = False.
 
         Returns:
             best_model_param (dict): a dict containing the best model parameters.
@@ -130,49 +124,36 @@ class TS2Vec:
         '''
         self.to(self.device)
 
-        if save_temp:
-            temp_dir = Path(".temporary")
-            os.makedirs(temp_dir, exist_ok=True)
+        # create the dir to save the checkpoints
+        checkpoint_path = f"{config['save_dir']}/{config['problem']}_pretrained_TS2Vec_last.pth"
+        if not os.path.isdir(config['save_dir']):
+            os.makedirs(config['save_dir'])
 
-        assert train_data.ndim == 3
-        
-        if max_train_length is not None:
-            sections = train_data.shape[1] // max_train_length
-            if sections >= 2:
-                train_data = np.concatenate(split_with_nan(train_data, sections, axis=1), axis=0)
+        # Resume the training stoped
+        if resume_train:
+            checkpoint = torch.load(checkpoint_path, weights_only=True)
+            self.load_state_dict(checkpoint['state_dict']) 
 
-        temporal_missing = np.isnan(train_data).all(axis=-1).any(axis=0)
-        if temporal_missing[0] or temporal_missing[-1]:
-            train_data = centerize_vary_length_series(train_data)
-        
-        train_data = train_data[~np.isnan(train_data).all(axis=2).all(axis=1)]
-        
-        train_dataset = TensorDataset(torch.from_numpy(train_data).to(torch.float))
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-
-        val_dataset = TensorDataset(torch.from_numpy(val_data).to(torch.float))
-        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
-        
         train_losses = []
         val_losses = []
 
         best_loss = torch.inf
+        best_epoch = None
         best_model_params = None
         
-        start_epoch = 0 if checkpoint is None else checkpoint['epoch']
-        for i in range(start_epoch, n_epochs):
+        start_epoch = 0 if resume_train is False else checkpoint['epoch']-1
+        for i in range(start_epoch, config['epochs']):
 
             # ---------------- Training phase ---------------- #
             self.train()
             running_loss = 0
 
-            batch_iter = tqdm(train_loader, desc=f"{i+1:2.0f}/{n_epochs}", total=len(train_loader))
+            batch_iter = tqdm(train_loader, desc=f"{i+1:2.0f}/{config['epochs']}", total=len(train_loader))
             for batch in batch_iter:
-                x = batch[0]
-                if max_train_length is not None and x.size(1) > max_train_length:
-                    window_offset = np.random.randint(x.size(1) - max_train_length + 1)
-                    x = x[:, window_offset : window_offset + max_train_length]
-                x = x.to(self.device)
+                x = batch[0].to(self.device)
+                # if max_train_length is not None and x.size(1) > max_train_length:
+                #     window_offset = np.random.randint(x.size(1) - max_train_length + 1)
+                #     x = x[:, window_offset : window_offset + max_train_length]
                 
                 optimizer.zero_grad()
 
@@ -223,30 +204,32 @@ class TS2Vec:
 
 
             # -------------- Save checkpoint -------------- #
-            if temp_dir:
-                checkpoint = {
-                    'model': self.net.state_dict(),
-                    'epoch': i+1
-                }
-                torch.save(checkpoint, temp_dir / "checkpoint.pt")
+            checkpoint = {'state_dict': self.net.state_dict(), 'epoch': i+1}
+            torch.save(checkpoint, checkpoint_path)
 
             running_loss /= len(val_loader)
             if running_loss < best_loss:
                 best_loss = running_loss
                 best_model_params = self.net.state_dict()
+                best_epoch = i+1
+
+                checkpoint = {'state_dict': best_model_params, 'epoch': best_epoch}
+                torch.save(checkpoint, f"{config['save_dir']}/{config['problem']}_pretrained_TS2Vec_best.pth")
 
             val_losses.append(running_loss)
-            
-
             print(f"[Train: {train_losses[-1]:.4f} | Val: {val_losses[-1]:.4f}]")
 
             if self.after_epoch_callback is not None:
                 self.after_epoch_callback(self, running_loss)
         
         self.cpu()
-        losses = {'train_losses': train_losses, 'val_losses': val_losses}
+        logs = {
+            'train_losses': train_losses, 
+            'val_losses': val_losses,
+            'best_epoch': best_epoch
+        }
 
-        return best_model_params, losses
+        return best_model_params, logs
 
 
     def _extract_context_view(self, x, crop_len):
@@ -264,59 +247,44 @@ class TS2Vec:
         return view_a, view_b
 
 
-    def _eval_with_pooling(self, x, mask=None, slicing=None, encoding_window=None):
-        out = self.net(x.to(self.device, non_blocking=True), mask)
-        if encoding_window == 'full_series':
-            if slicing is not None:
-                out = out[:, slicing]
-            out = F.max_pool1d(
-                out.transpose(1, 2),
-                kernel_size = out.size(1),
-            ).transpose(1, 2)
-            
-        elif isinstance(encoding_window, int):
-            out = F.max_pool1d(
-                out.transpose(1, 2),
-                kernel_size = encoding_window,
-                stride = 1,
-                padding = encoding_window // 2
-            ).transpose(1, 2)
-            if encoding_window % 2 == 0:
-                out = out[:, :-1]
-            if slicing is not None:
-                out = out[:, slicing]
-            
-        elif encoding_window == 'multiscale':
-            p = 0
-            reprs = []
-            while (1 << p) + 1 < out.size(1):
-                t_out = F.max_pool1d(
-                    out.transpose(1, 2),
-                    kernel_size = (1 << (p + 1)) + 1,
-                    stride = 1,
-                    padding = 1 << p
-                ).transpose(1, 2)
-                if slicing is not None:
-                    t_out = t_out[:, slicing]
-                reprs.append(t_out)
-                p += 1
-            out = torch.cat(reprs, dim=-1)
-            
-        else:
-            if slicing is not None:
-                out = out[:, slicing]
-            
-        return out.cpu()
+    def _eval_with_pooling(self, x: torch.Tensor, mask=None, slicing=None, encoding_window=None):
+        ''' Compute representations using the model.
+        Args:
+            x (torch.Tensor): The input data. It should have a shape of (n_instance, n_timestamps, n_features). No missing data should be passed.
+            mask (str): The mask used by encoder can be specified with this parameter. This can be set to 'binomial', 'continuous', 'all_true', 'all_false' or 'mask_last'.
+            slicing (slice): The slice used to slice the output.
+            encoding_window (Union[str, int]): When this param is specified, the computed representation would the max pooling over this window. This can be set to 'full_series', 'multiscale' or an integer specifying the pooling kernel size.
+
+        Returns:
+            out: The representations for data.
+        '''
+        z1 = self.net(x, mask)
+        # max pooling over the termporal dimension
+        embedding = F.adaptive_max_pool1d(z1.transpose(1, 2), 1).transpose(1, 2)
+
+        return embedding
     
 
     def encode(self, data, rearrange=True):
-        '''Compute representations using the model'''
-        if rearrange:
-            data = torch.permute(data, (0, 2, 1)) # (B, C, T) -> (B, T, C)
-            repr = self._eval_with_pooling(data).to(data.device)
-            repr = torch.permute(repr, (0, 2, 1)) # (B, T, C) -> (B, C, T) 
-        else:
-            repr = self._eval_with_pooling(data)
+        '''Compute representations using the model
+
+        Args:
+            data (numpy.ndarray): Data to be encoded.
+            rearrange (bool): Set this to True if the input data is in (n_instance, n_features, n_timestamps) format. Otherwise, set this to False.
+
+        Returns:
+            repr: The representations for data with the `data` original dimension order.
+        '''
+
+        if rearrange: # (B, C, T) -> (B, T, C)
+            data = torch.permute(data, (0, 2, 1)) 
+            
+        z1 = self.net(data)
+        # max pooling over the termporal dimension
+        repr = F.adaptive_max_pool1d(z1.transpose(1, 2), 1).transpose(1, 2)
+
+        if rearrange: # (B, T, C) -> (B, C, T) 
+            repr = torch.permute(repr, (0, 2, 1)) 
         
         return repr
     

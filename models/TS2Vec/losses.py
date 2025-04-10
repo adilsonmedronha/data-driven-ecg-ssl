@@ -20,9 +20,9 @@ def hierarchical_contrastive_loss(z1, z2, alpha=0.5, temporal_unit=0):
             loss += alpha * instance_contrastive_loss(z1, z2)
         d += 1
 
-    del z1
-    del z2
-    torch.cuda.empty_cache()
+    # del z1
+    # del z2
+    # torch.cuda.empty_cache()
     
     return loss / d
 
@@ -52,17 +52,17 @@ def temporal_contrastive_loss(z1, z2):
     logits = torch.tril(sim, diagonal=-1)[:, :, :-1]    # B x 2T x (2T-1)
     logits += torch.triu(sim, diagonal=1)[:, :, 1:]
 
-    del z
-    del sim
-    torch.cuda.empty_cache()
+    # del z
+    # del sim
+    # torch.cuda.empty_cache()
     
     logits = -F.log_softmax(logits, dim=-1)
     
     t = torch.arange(T, device=z1.device)
     loss = (logits[:, t, T + t - 1].mean() + logits[:, T + t, t].mean()) / 2
 
-    del logits 
-    del t
-    torch.cuda.empty_cache()
+    # del logits 
+    # del t
+    # torch.cuda.empty_cache()
 
     return loss
