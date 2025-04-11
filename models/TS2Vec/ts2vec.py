@@ -1,4 +1,5 @@
 import os
+import json
 import numpy as np
 from tqdm import tqdm
 from typing import Optional
@@ -217,7 +218,10 @@ class TS2Vec:
                 torch.save(checkpoint, f"{config['save_dir']}/{config['problem']}_pretrained_TS2Vec_best.pth")
 
             val_losses.append(running_loss)
+
             print(f"[Train: {train_losses[-1]:.4f} | Val: {val_losses[-1]:.4f}]")
+            json.dump(train_losses, open(f"{config['save_dir']}/{config['problem']}_TS2Vec_train_loss.json", 'w'))
+            json.dump(val_losses, open(f"{config['save_dir']}/{config['problem']}_TS2Vec_val_loss.json", 'w'))
 
             if self.after_epoch_callback is not None:
                 self.after_epoch_callback(self, running_loss)
