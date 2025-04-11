@@ -220,8 +220,8 @@ class TS2Vec:
             val_losses.append(running_loss)
 
             print(f"[Train: {train_losses[-1]:.4f} | Val: {val_losses[-1]:.4f}]")
-            json.dump(train_losses, open(f"{config['save_dir']}/{config['problem']}_TS2Vec_train_loss.json", 'w'))
-            json.dump(val_losses, open(f"{config['save_dir']}/{config['problem']}_TS2Vec_val_loss.json", 'w'))
+            json.dump(obj={'train_losses': train_losses, 'val_losses': val_losses},
+                      fp=open(f"{config['save_dir']}/{config['problem']}_TS2Ve_losses.json", 'w'))
 
             if self.after_epoch_callback is not None:
                 self.after_epoch_callback(self, running_loss)
