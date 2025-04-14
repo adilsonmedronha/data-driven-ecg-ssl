@@ -7,7 +7,7 @@ from Dataset import dataloader
 from models.Series2Vec.runner import pre_training as Series2Vec_pre_training
 from models.TS2Vec.runner import pre_training as TS2Vec_pre_training
 from models.TSTCC.runner import pre_training as TSTCC_pre_training
-
+from mine_utils import set_seed
 
 # Set the Numba configuration to enable PYNVJITLINK
 numba_config.CUDA_ENABLE_PYNVJITLINK = 1
@@ -25,6 +25,7 @@ if __name__ == '__main__':
         config = json.load(f)
 
     config['epochs'] = args.epochs
+    set_seed(config['seed'])
 
     # ------------------------------------------- Pretrain Series2Vec -------------------------------------------
     if config['Model_Type'] == 'Series2Vec':
@@ -62,6 +63,7 @@ if __name__ == '__main__':
             config['problem'] = problem
             
             Data = dataloader.data_loader(config)
+
             updated_config, logs = TSTCC_pre_training(config, Data)
 
             # Save the logs to a file 

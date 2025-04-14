@@ -36,16 +36,16 @@ def pre_training(config, data, resume_train = False):
                                  y_train=data['train_label'],
                                  config=config_aug, 
                                  training_mode="self_supervised")
-    
+
     val_dataset = Load_Dataset(X_train=data['test_data'],
                                y_train=data['test_label'], 
                                config=config_aug, 
                                training_mode="self_supervised")
 
-    logger.info(f"train shape {train_dataset.x_data.shape} / test shape {val_dataset.y_data.shape}")
+    logger.info(f"train shape {train_dataset.x_data.shape} / test shape {val_dataset.x_data.shape}")
 
-    train_loader = DataLoader(dataset=train_dataset, batch_size=config['batch_size'], shuffle=True, pin_memory=True)
-    test_loader = DataLoader(dataset=val_dataset, batch_size=config['batch_size'], shuffle=True, pin_memory=True)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=config['batch_size'], shuffle=True, pin_memory=True, drop_last=True)
+    test_loader = DataLoader(dataset=val_dataset, batch_size=config['batch_size'], shuffle=True, pin_memory=True, drop_last=True)
 
     # instanciate the model ---------------------------------------------------------------
     logger.info("Creating the TS2Vec Self-supervised model ...")
@@ -57,20 +57,20 @@ def pre_training(config, data, resume_train = False):
 
     # start training ----------------------------------------------------------------------
     since = datetime.now()
-    logger.info(f"\nSelf-supervised TS-TCC pretraining ...")
+    logger.info(f"Self-supervised TS-TCC pretraining ...")
 
-    _, logs = tc.fit_ssl(train_loader, 
+    _, logs = tc.fit_ssl(train_loader,
                          test_loader,
                          tc_optim,
-                         encoder, 
-                         encoder_optim, 
-                         config, 
+                         encoder,
+                         encoder_optim,
+                         config,
                          **model_args['cc_loss'])
     time = datetime.now() - since
     logs['time'] = time.total_seconds()
 
     logger.info(f"Best validation loss: {logs['val_losses'][logs['best_epoch']-1]}")
-    logger.info(f"Saved best model, the model from epoch {logs['best_epoch']}\n")
-    logger.info(f"\nFinished! Training time {time}")
+    logger.info(f"Saved best model, the model from epoch {logs['best_epoch']}")
+    logger.info(f"Finished! Training time {time}")
 
     return config, logs

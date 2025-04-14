@@ -1,7 +1,7 @@
 {
     "Model_Type": "TSTCC",
     "Training_mode": "Pre_Training",
-    "save_dir": "Results/Pre_Training/Benchmarks/2025-04-11_14-00/checkpoints",
+    "save_dir": "Results/Pre_Training/Benchmarks/2025-04-13_13-47/checkpoints",
     "data_dir": "Dataset/Benchmarks",
     "seed": 1234,
     "gpu": 0,
