@@ -58,7 +58,6 @@ def train(head_model, ssl_model, head_optimizer, ssl_optimizer, loss_module, tra
         
         with torch.set_grad_enabled(is_finetuning):
             z_emb = ssl_model.linear_prob(x)
-        
         y_hat = head_model(z_emb)
         loss = loss_module(y_hat, y)
         loss.backward()
@@ -134,25 +133,20 @@ def test(head_model, ssl_model, test_loader, loss_module, device, save_path):
 def run(run_idx, epochs, head_model, 
         ssl_model, 
         head_optimizer, 
-        ssl_optimizer, loss_module, train_loader, val_loader, head_config, ssl_config, save_path, is_finetuning=False):
-    
+        ssl_optimizer, loss_module, train_loader, val_loader, save_path, device='cuda', is_finetuning=False):
     print(head_config.get('wandb_project', 'default_project'))
     best_val_loss = float('inf')
-    device = head_config['gpu']
     # TODO SAVE UMAP OF TH EBEST RUN
     umap_ssl_emb_before, train_labels = umap_embedding(ssl_model, 
                                                        train_loader, 
                                                        device, 
                                                        mtype= 'ssl', 
-                                                       name = 'UMAP_ssl_emb_before', save_path=save_path)
+                                                       name = f'UMAP_encoder_before_{RUN_NAME}', save_path=save_path)
     fig_umap_before = plot_umap(umap_ssl_emb_before, 
                                 train_labels, 
                                 name = f"UMAP SSL BEFORE {RUN_NAME}",
-                                save_path=os.path.join(save_path, f"umap_ssl_emb_before_{RUN_NAME}.pdf"))
+                                save_path=os.path.join(save_path, f"UMAP_encoder_before_{RUN_NAME}.pdf"))
     for epoch in range(epochs): 
-        if epoch == 999:
-            print('' * 50)
-
         train_loss = train(head_model,
                            ssl_model, 
                            head_optimizer, 
@@ -174,18 +168,18 @@ def run(run_idx, epochs, head_model,
     umap_ssl_emb_after_finetuning, _  = umap_embedding(ssl_model, 
                                                        train_loader, 
                                                        device, mtype='ssl', 
-                                                       name = 'UMAP_ssl_emb_after_finetuning', save_path=save_path)
+                                                       name = f'UMAP_encoder_after_{RUN_NAME}', save_path=save_path)
     
     fig_umap_after = plot_umap(umap_ssl_emb_after_finetuning, 
                                train_labels, 
                                name = f"UMAP SSL AFTER {RUN_NAME}",
-                               save_path = os.path.join(save_path, f"UMAP_ssl_after_{RUN_NAME}.pdf"))
+                               save_path = os.path.join(save_path, f"UMAP_encoder_after_{RUN_NAME}.pdf"))
     
     umap_head_emb_after_finetuning, _ = umap_embedding(ssl_model, 
                                                        train_loader, 
                                                        device, head_model, 
                                                        mtype=HEAD_TYPE, 
-                                                       name = 'UMAP_head_emb_after_finetuning', save_path=save_path)
+                                                       name = f'UMAP_head_after_{RUN_NAME}', save_path=save_path)
     
     fig_umap_mlp_after = plot_umap(umap_head_emb_after_finetuning, 
                                    train_labels, 
@@ -214,6 +208,7 @@ if __name__ == '__main__':
     with open(args.head_configuration_file, 'r') as f:
         head_config = json.load(f)
 
+    # TODO save args as json file
     device = head_config['gpu']
     N_EXPERIMENTS = args.runs
 
@@ -229,8 +224,8 @@ if __name__ == '__main__':
     SS_Encoder.to(encoder_config['gpu'])
 
     # ----------------------------------------------- Load Target dataset -----------------------------------------------
-    train_loader, val_loader, test_loader = load_fragment_dataset(head_config)
-
+    train_loader, val_loader, test_loader = load_fragment_dataset(batch_size = 64)
+    
     # ----------------------------------------------- Configure the Wandb -----------------------------------------------
     RUN_NAME = args.description
     HEAD_TYPE = "mlp"
@@ -256,7 +251,6 @@ if __name__ == '__main__':
     for run_idx in range(N_EXPERIMENTS):
         set_seed(seeds[run_idx])
         head_model, adam_optimizer, criterion = select_head(args.model_name, head_config)
-
         train_results = run(run_idx, 
                             epochs= args.epochs,
                             head_model = head_model, 
@@ -266,8 +260,6 @@ if __name__ == '__main__':
                             loss_module = criterion,
                             train_loader = train_loader, 
                             val_loader = val_loader, 
-                            head_config = head_config,
-                            ssl_config = encoder_config,
                             save_path = output_dir,
                             is_finetuning = args.is_finetuning)
         
