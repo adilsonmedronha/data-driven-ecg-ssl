@@ -1,0 +1,25 @@
+
+{
+    "Model_Type": "Series2Vec",
+    "Norm": false,
+    "Training_mode": "Pre_Training",
+    "batch_size": 64,
+    "console": false,
+    "data_dir": "Dataset/Benchmarks",
+    "problem":"WESAD",
+    "dataset": "Benchmarks",
+    "dim_ff": 256,
+    "dropout": 0.01,
+    "emb_size": 16,
+    "epochs": 600,
+    "gpu": 0,
+    "key_metric": "accuracy",
+    "layers": 4,
+    "lr": 0.001,
+    "num_heads": 8,
+    "rep_size": 320,
+    "seed": 1234,
+    "tensorboard_dir": "Results/Pre_Training/S2V/2025-03-29_07-38/tb_summaries",
+    "val_interval": 2,
+    "val_ratio": 0.2
+}
