@@ -4,12 +4,17 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-def get_optimizer(name):
+def get_optimizer(name, model, config: dict):
 
-    if name == "Adam":
-        return torch.optim.Adam
-    elif name == "RAdam":
-        return RAdam
+    if name == "RAdam":
+        optim_class = RAdam
+    else:
+        optim_class = torch.optim.Adam
+
+    if config['Model_Type'] == "Series2Vec":
+        return optim_class(model.parameters(), lr=config['lr'], weight_decay=0)
+    else:
+        return optim_class(model.parameters(), **config['optim_args'])
 
 
 # from https://github.com/LiyuanLucasLiu/RAdam/blob/master/radam/radam.py

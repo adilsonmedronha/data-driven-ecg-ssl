@@ -1,9 +1,9 @@
 
 import matplotlib.pyplot as plt
 import wandb
-import umap.plot as uplot
 import umap
 import torch
+from torch import nn
 import seaborn as sns
 import os
 from sklearn.manifold import TSNE
@@ -11,6 +11,23 @@ import random
 import numpy as np
 import argparse
 from torch.utils.data import TensorDataset, DataLoader
+from models.heads.MLP import MLP
+from models.heads.FCN import FCN
+
+
+
+def select_head(head_model, head_config):
+    if head_model == "MLP":
+        in_dim, hidden_dim, output_size = head_config["layers_config"]
+        model = MLP(in_dim, hidden_dim, output_size)
+    elif head_model == "FCN":
+        in_dim, out_dim = head_config["layers_config"]
+        model = FCN(in_dim, out_dim)
+
+    model.to(head_config['gpu'])
+    adam_optimizer = torch.optim.Adam(model.parameters(), lr=head_config['lr'])
+    criterion = nn.CrossEntropyLoss()
+    return model, adam_optimizer, criterion
 
 
 def plot_umap(embedding, train_labels, name, save_path="umap_plot.pdf"):
@@ -50,7 +67,7 @@ def umap_embedding(model, dataloader, device, head_model=None, mtype='ssl', name
             if x.shape[0] != batch_samples:
                 continue
             z_emb = model.linear_prob(x)
-            if mtype == 'mlp':
+            if mtype != 'ssl':
                 z_emb = head_model(z_emb)
             z_emb = z_emb.cpu().numpy()
             labels = y.cpu().numpy()

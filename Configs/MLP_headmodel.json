@@ -1,7 +1,7 @@
 
 {
     "dataset": "Fragment",
-    "layers_config": [640, 128, 6], 
+    "layers_config": [320, 128, 6], 
     "batch_size": 64,
     "gpu": 0,
     "lr": 0.0001

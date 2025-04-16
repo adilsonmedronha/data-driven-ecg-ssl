@@ -52,13 +52,10 @@ class BaseModel(nn.Module):
         return x
     
 
-    def encode(self, x_in) -> torch.Tensor: 
+    def linear_prob(self, x_in) -> torch.Tensor: 
         '''Encode the input time series.'''
-
         repr = self.forward(x_in)
-        repr = F.adaptive_avg_pool1d(repr, 1)
-
-        return repr
+        return F.adaptive_avg_pool1d(repr, 1).squeeze()
 
 
     def tuning_mode(self, mode: str):

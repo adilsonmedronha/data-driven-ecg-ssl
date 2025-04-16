@@ -1,5 +1,6 @@
 import logging
 from models.Series2Vec import Series2Vec
+from models.TSTCC import Encoder as TSTCC_encoder
 
 
 logger = logging.getLogger('__main__')
@@ -15,12 +16,13 @@ def Model_factory(config, data):
 
     if config['Model_Type'] == 'Series2Vec':
         model = Series2Vec.Seires2Vec(config, num_classes=config['num_labels'])
-    '''
-    if config['Model_Type'] == 'TS_TCC':
-        model = TS_TCC.TS_TCC(config, num_classes=config['num_labels'])
-    if config['Model_Type'] == 'TF_C':
-        model = TF_C.TF_C(config, num_classes=config['num_labels'])
-    '''
+    
+    if config['Model_Type'] == 'TSTCC':
+        model = TSTCC_encoder(**config['model_args']['encoder'])
+
+    # if config['Model_Type'] == 'TF_C':
+    #     model = TF_C.TF_C(config, num_classes=config['num_labels'])
+    
 
 
     logger.info("Model:\n{}".format(model))

@@ -147,11 +147,17 @@ def save_plots(train_acc, valid_acc, train_loss, valid_loss):
     plt.savefig('outputs/loss.png')
 
 
-def load_model(model, model_path, optimizer=None, resume=False, change_output=False,
+def load_model(model, model_path, model_type, optimizer=None, resume=False, change_output=False,
                lr=None, lr_step=None, lr_factor=None):
     start_epoch = 0
     checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
-    state_dict = deepcopy(checkpoint['state_dict'])
+
+    if model_type == "TSTCC":
+        state_dict = deepcopy(checkpoint['encoder'])
+    else:
+        state_dict = deepcopy(checkpoint['state_dict'])
+
+
     if change_output:
         for key, val in checkpoint['state_dict'].items():
             if key.startswith('output_layer'):

@@ -1,5 +1,4 @@
 import torch
-import argparse
 import os
 import json
 from models.Series2Vec.S2V_training import *
@@ -9,9 +8,6 @@ from Dataset import dataloader
 from models.optimizers import get_optimizer, get_loss_module
 from torch.utils.data import DataLoader
 from sklearn.metrics import confusion_matrix
-from models.heads.MLP import MLP
-from models.heads.FCN import FCN
-import torch.nn as nn
 from datetime import datetime
 from torch.utils.data import DataLoader
 import wandb
@@ -21,28 +17,15 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
-from mine_utils import plot_umap, tsne_embedding,  umap_embedding, set_seed, get_parser, load_fragment_dataset
-from torchsummary import summary
+from mine_utils import plot_umap, select_head,  umap_embedding, set_seed, get_parser, load_fragment_dataset
 
 import torch
 torch.cuda.empty_cache()
 
-
 import warnings
 warnings.filterwarnings("ignore")
 
-def select_head(head_model, head_config):
-    if head_model == "MLP":
-        in_dim, hidden_dim, output_size = head_config["layers_config"]
-        model = MLP(in_dim, hidden_dim, output_size)
-    elif head_model == "FCN":
-        in_dim, out_dim = head_config["layers_config"]
-        model = FCN(in_dim, out_dim)
 
-    model.to(device)
-    adam_optimizer = torch.optim.Adam(model.parameters(), lr=head_config['lr'])
-    criterion = nn.CrossEntropyLoss()
-    return model, adam_optimizer, criterion
 
 
 def train(head_model, ssl_model, head_optimizer, ssl_optimizer, loss_module, train_loader, device, is_finetuning=True):
@@ -58,6 +41,7 @@ def train(head_model, ssl_model, head_optimizer, ssl_optimizer, loss_module, tra
         
         with torch.set_grad_enabled(is_finetuning):
             z_emb = ssl_model.linear_prob(x)
+            
         y_hat = head_model(z_emb)
         loss = loss_module(y_hat, y)
         loss.backward()
@@ -178,12 +162,12 @@ def run(run_idx, epochs, head_model,
     umap_head_emb_after_finetuning, _ = umap_embedding(ssl_model, 
                                                        train_loader, 
                                                        device, head_model, 
-                                                       mtype=HEAD_TYPE, 
+                                                       mtype=head_model._get_name(), 
                                                        name = f'UMAP_head_after_{RUN_NAME}', save_path=save_path)
     
     fig_umap_mlp_after = plot_umap(umap_head_emb_after_finetuning, 
                                    train_labels, 
-                                   name = f"UMAP {HEAD_TYPE} BEFORE {RUN_NAME}",
+                                   name = f"UMAP {head_model._get_name()} BEFORE {RUN_NAME}",
                                    save_path = os.path.join(save_path, f"UMAP_head_after_{RUN_NAME}.pdf"))
     
     wandb.log({"umap_before": fig_umap_before, 
@@ -216,11 +200,10 @@ if __name__ == '__main__':
     path2load_encoder = os.path.join(args.encoder_checkpoint_path)
     DataWhereS2VwereTrained = dataloader.data_loader(encoder_config)
     model = Model_factory(encoder_config, DataWhereS2VwereTrained)
-    optim_class = get_optimizer("RAdam")
-    encoder_config['optimizer'] = optim_class(model.parameters(), lr=encoder_config['lr'], weight_decay=0)
+    encoder_config['optimizer'] = get_optimizer("RAdam", model, encoder_config)
     encoder_config['loss_module'] = get_loss_module()
     model.to(encoder_config['gpu'])
-    SS_Encoder, optimizer, start_epoch = load_model(model, path2load_encoder, encoder_config['optimizer'])
+    SS_Encoder, optimizer, start_epoch = load_model(model, path2load_encoder, encoder_config['Model_Type'], encoder_config['optimizer'])
     SS_Encoder.to(encoder_config['gpu'])
 
     # ----------------------------------------------- Load Target dataset -----------------------------------------------
@@ -228,11 +211,11 @@ if __name__ == '__main__':
     
     # ----------------------------------------------- Configure the Wandb -----------------------------------------------
     RUN_NAME = args.description
-    HEAD_TYPE = "mlp"
+    # HEAD_TYPE = "mlp"
     wandb.init(project='ssl_pretrained_on_multidomain_dataset',
-           entity='adilson',
+           entity='labic-icmc',
            name= RUN_NAME)
-    wandb.config.update({'head_model': head_config, 's2v_ssl_model': encoder_config})
+    wandb.config.update({'head_model': head_config, 'tstcc_ssl_model': encoder_config})
     wandb.run.save()
     
     # ------------------------------------------------ Create output dir ------------------------------------------------
