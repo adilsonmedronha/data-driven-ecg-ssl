@@ -1,0 +1,78 @@
+_wandb:
+    value:
+        cli_version: 0.19.9
+        m: []
+        python_version: 3.10.16
+        t:
+            "1":
+                - 1
+                - 5
+                - 53
+                - 55
+            "2":
+                - 1
+                - 5
+                - 53
+                - 55
+            "3":
+                - 2
+                - 13
+                - 23
+                - 55
+            "4": 3.10.16
+            "5": 0.19.9
+            "8":
+                - 5
+            "10":
+                - 3
+            "12": 0.19.9
+            "13": linux-x86_64
+head_model:
+    value:
+        batch_size: 64
+        dataset: Fragment
+        gpu: 0
+        layers_config:
+            - 320
+            - 128
+            - 6
+        lr: 0.0001
+tstcc_ssl_model:
+    value:
+        Data_shape:
+            - 104877
+            - 1
+            - 720
+        Model_Type: TS2Vec
+        Training_mode: Pre_Training
+        batch_size: 64
+        data_dir: Dataset/Benchmarks
+        epochs: 600
+        gpu: 0
+        loss_module: NoFussCrossEntropyLoss()
+        model_args:
+            depth: 10
+            dropout: 0.1
+            hidden_dim: 64
+            in_dim: 1
+            kernel_size: 3
+            mask_mode: binomial
+            out_dim: 320
+        num_labels: 5
+        optim_args:
+            betas:
+                - 0.9
+                - 0.999
+            lr: 0.001
+        optimizer: |-
+            RAdam (
+            Parameter Group 0
+                betas: [0.9, 0.999]
+                buffer: [[None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None], [None, None, None]]
+                eps: 1e-08
+                lr: 0.001
+                weight_decay: 0
+            )
+        problem: WESAD_ECGonly
+        save_dir: Results/Pre_Training/Benchmarks/2025-04-15_16-04/checkpoints
+        seed: 1234

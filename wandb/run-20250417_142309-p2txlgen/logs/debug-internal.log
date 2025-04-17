@@ -1,0 +1,16 @@
+{"time":"2025-04-17T14:23:09.039502504-03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/home/rcsilva/Documentos/models/ssl-multidomain/wandb/run-20250417_142309-p2txlgen/logs/debug-core.log"}
+{"time":"2025-04-17T14:23:09.349102653-03:00","level":"INFO","msg":"created new stream","id":"p2txlgen"}
+{"time":"2025-04-17T14:23:09.349158811-03:00","level":"INFO","msg":"stream: started","id":"p2txlgen"}
+{"time":"2025-04-17T14:23:09.349185492-03:00","level":"INFO","msg":"writer: Do: started","stream_id":"p2txlgen"}
+{"time":"2025-04-17T14:23:09.349220468-03:00","level":"INFO","msg":"sender: started","stream_id":"p2txlgen"}
+{"time":"2025-04-17T14:23:09.349203085-03:00","level":"INFO","msg":"handler: started","stream_id":"p2txlgen"}
+{"time":"2025-04-17T14:23:09.69499645-03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-17T14:30:34.163880666-03:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-17T14:30:34.163956361-03:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-17T14:30:35.071038087-03:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-17T14:30:35.165495151-03:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading history steps 1493-1519, summary, console lines 1482-1505","runtime_seconds":0.094274456}],"total_operations":1}}
+{"time":"2025-04-17T14:30:35.311527184-03:00","level":"INFO","msg":"stream: closing","id":"p2txlgen"}
+{"time":"2025-04-17T14:30:35.311560367-03:00","level":"INFO","msg":"handler: closed","stream_id":"p2txlgen"}
+{"time":"2025-04-17T14:30:35.311578071-03:00","level":"INFO","msg":"writer: Close: closed","stream_id":"p2txlgen"}
+{"time":"2025-04-17T14:30:35.311583091-03:00","level":"INFO","msg":"sender: closed","stream_id":"p2txlgen"}
+{"time":"2025-04-17T14:30:35.311723148-03:00","level":"INFO","msg":"stream: closed","id":"p2txlgen"}
