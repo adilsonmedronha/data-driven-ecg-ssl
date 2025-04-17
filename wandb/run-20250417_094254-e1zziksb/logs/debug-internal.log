@@ -1,0 +1,16 @@
+{"time":"2025-04-17T09:42:54.567538411-03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/home/labic/Documentos/rafael-silva/ssl-multidomain/wandb/run-20250417_094254-e1zziksb/logs/debug-core.log"}
+{"time":"2025-04-17T09:42:54.87216534-03:00","level":"INFO","msg":"created new stream","id":"e1zziksb"}
+{"time":"2025-04-17T09:42:54.87219321-03:00","level":"INFO","msg":"stream: started","id":"e1zziksb"}
+{"time":"2025-04-17T09:42:54.872202379-03:00","level":"INFO","msg":"writer: Do: started","stream_id":"e1zziksb"}
+{"time":"2025-04-17T09:42:54.87225799-03:00","level":"INFO","msg":"handler: started","stream_id":"e1zziksb"}
+{"time":"2025-04-17T09:42:54.872307726-03:00","level":"INFO","msg":"sender: started","stream_id":"e1zziksb"}
+{"time":"2025-04-17T09:42:55.187043194-03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-17T09:45:41.431361057-03:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-17T09:45:41.431392845-03:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-17T09:45:42.369171393-03:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-17T09:45:42.432499047-03:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading history steps 1518-1519, summary","runtime_seconds":0.063255374}],"total_operations":1}}
+{"time":"2025-04-17T09:45:42.609397499-03:00","level":"INFO","msg":"stream: closing","id":"e1zziksb"}
+{"time":"2025-04-17T09:45:42.609406484-03:00","level":"INFO","msg":"handler: closed","stream_id":"e1zziksb"}
+{"time":"2025-04-17T09:45:42.609417889-03:00","level":"INFO","msg":"sender: closed","stream_id":"e1zziksb"}
+{"time":"2025-04-17T09:45:42.609413101-03:00","level":"INFO","msg":"writer: Close: closed","stream_id":"e1zziksb"}
+{"time":"2025-04-17T09:45:42.609459548-03:00","level":"INFO","msg":"stream: closed","id":"e1zziksb"}

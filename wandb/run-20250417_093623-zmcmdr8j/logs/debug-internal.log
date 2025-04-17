@@ -1,0 +1,16 @@
+{"time":"2025-04-17T09:36:23.574771294-03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/home/labic/Documentos/rafael-silva/ssl-multidomain/wandb/run-20250417_093623-zmcmdr8j/logs/debug-core.log"}
+{"time":"2025-04-17T09:36:23.86692915-03:00","level":"INFO","msg":"created new stream","id":"zmcmdr8j"}
+{"time":"2025-04-17T09:36:23.867008392-03:00","level":"INFO","msg":"stream: started","id":"zmcmdr8j"}
+{"time":"2025-04-17T09:36:23.867083964-03:00","level":"INFO","msg":"writer: Do: started","stream_id":"zmcmdr8j"}
+{"time":"2025-04-17T09:36:23.86717769-03:00","level":"INFO","msg":"sender: started","stream_id":"zmcmdr8j"}
+{"time":"2025-04-17T09:36:23.867274509-03:00","level":"INFO","msg":"handler: started","stream_id":"zmcmdr8j"}
+{"time":"2025-04-17T09:36:24.208945352-03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-17T09:37:27.174831152-03:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-17T09:37:27.174874911-03:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-17T09:37:28.157072037-03:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-17T09:37:28.175646295-03:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading history steps 1513-1519, summary, console lines 1502-1505","runtime_seconds":0.018478762}],"total_operations":1}}
+{"time":"2025-04-17T09:37:28.428589457-03:00","level":"INFO","msg":"stream: closing","id":"zmcmdr8j"}
+{"time":"2025-04-17T09:37:28.428595781-03:00","level":"INFO","msg":"handler: closed","stream_id":"zmcmdr8j"}
+{"time":"2025-04-17T09:37:28.428600342-03:00","level":"INFO","msg":"writer: Close: closed","stream_id":"zmcmdr8j"}
+{"time":"2025-04-17T09:37:28.42861375-03:00","level":"INFO","msg":"sender: closed","stream_id":"zmcmdr8j"}
+{"time":"2025-04-17T09:37:28.428634239-03:00","level":"INFO","msg":"stream: closed","id":"zmcmdr8j"}

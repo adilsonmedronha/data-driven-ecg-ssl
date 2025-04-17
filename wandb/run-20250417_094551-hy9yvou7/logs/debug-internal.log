@@ -1,0 +1,16 @@
+{"time":"2025-04-17T09:45:51.237171839-03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/home/labic/Documentos/rafael-silva/ssl-multidomain/wandb/run-20250417_094551-hy9yvou7/logs/debug-core.log"}
+{"time":"2025-04-17T09:45:51.560721663-03:00","level":"INFO","msg":"created new stream","id":"hy9yvou7"}
+{"time":"2025-04-17T09:45:51.560783448-03:00","level":"INFO","msg":"stream: started","id":"hy9yvou7"}
+{"time":"2025-04-17T09:45:51.560826854-03:00","level":"INFO","msg":"writer: Do: started","stream_id":"hy9yvou7"}
+{"time":"2025-04-17T09:45:51.560885143-03:00","level":"INFO","msg":"handler: started","stream_id":"hy9yvou7"}
+{"time":"2025-04-17T09:45:51.560938258-03:00","level":"INFO","msg":"sender: started","stream_id":"hy9yvou7"}
+{"time":"2025-04-17T09:45:51.884655184-03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-17T09:49:27.69406223-03:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-17T09:49:27.694096286-03:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-17T09:49:28.696605382-03:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading output.log","runtime_seconds":0.298469933,"progress":"77.3KB/77.3KB"},{"desc":"uploading config.yaml","runtime_seconds":0.070371026,"progress":"2.2KB/2.2KB"}],"total_operations":2}}
+{"time":"2025-04-17T09:49:28.908074252-03:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-17T09:49:29.185486845-03:00","level":"INFO","msg":"stream: closing","id":"hy9yvou7"}
+{"time":"2025-04-17T09:49:29.185502155-03:00","level":"INFO","msg":"handler: closed","stream_id":"hy9yvou7"}
+{"time":"2025-04-17T09:49:29.185511233-03:00","level":"INFO","msg":"writer: Close: closed","stream_id":"hy9yvou7"}
+{"time":"2025-04-17T09:49:29.185525558-03:00","level":"INFO","msg":"sender: closed","stream_id":"hy9yvou7"}
+{"time":"2025-04-17T09:49:29.185564184-03:00","level":"INFO","msg":"stream: closed","id":"hy9yvou7"}

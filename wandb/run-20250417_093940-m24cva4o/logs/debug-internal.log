@@ -1,0 +1,16 @@
+{"time":"2025-04-17T09:39:40.561537782-03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/home/labic/Documentos/rafael-silva/ssl-multidomain/wandb/run-20250417_093940-m24cva4o/logs/debug-core.log"}
+{"time":"2025-04-17T09:39:40.862923601-03:00","level":"INFO","msg":"created new stream","id":"m24cva4o"}
+{"time":"2025-04-17T09:39:40.863008432-03:00","level":"INFO","msg":"stream: started","id":"m24cva4o"}
+{"time":"2025-04-17T09:39:40.863105231-03:00","level":"INFO","msg":"writer: Do: started","stream_id":"m24cva4o"}
+{"time":"2025-04-17T09:39:40.863129865-03:00","level":"INFO","msg":"handler: started","stream_id":"m24cva4o"}
+{"time":"2025-04-17T09:39:40.863256585-03:00","level":"INFO","msg":"sender: started","stream_id":"m24cva4o"}
+{"time":"2025-04-17T09:39:41.121608541-03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-17T09:40:43.689407568-03:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-17T09:40:43.689438729-03:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-17T09:40:44.64410949-03:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-17T09:40:44.690195211-03:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading history steps 1517-1519, summary","runtime_seconds":0.045995772}],"total_operations":1}}
+{"time":"2025-04-17T09:40:44.915404578-03:00","level":"INFO","msg":"stream: closing","id":"m24cva4o"}
+{"time":"2025-04-17T09:40:44.9154122-03:00","level":"INFO","msg":"handler: closed","stream_id":"m24cva4o"}
+{"time":"2025-04-17T09:40:44.915417257-03:00","level":"INFO","msg":"writer: Close: closed","stream_id":"m24cva4o"}
+{"time":"2025-04-17T09:40:44.915423204-03:00","level":"INFO","msg":"sender: closed","stream_id":"m24cva4o"}
+{"time":"2025-04-17T09:40:44.915462586-03:00","level":"INFO","msg":"stream: closed","id":"m24cva4o"}

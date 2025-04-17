@@ -1,0 +1,62 @@
+{
+  "os": "Linux-6.9.3-76060903-generic-x86_64-with-glibc2.35",
+  "python": "CPython 3.10.16",
+  "startedAt": "2025-04-17T12:37:37.222820Z",
+  "args": [
+    "--model_name",
+    "MLP",
+    "--description",
+    "MLP_finetuning_and_four_domains",
+    "--head_configuration_file",
+    "Configs/MLP_headmodel.json",
+    "--encoder_configuration_file",
+    "Results/Pre_Training/TSTCC/2025-04-14_13-38/WESAD_TSTCC_config.json",
+    "--encoder_checkpoint_path",
+    "Results/Pre_Training/TSTCC/2025-04-14_13-38/checkpoints/WESAD_pretrained_TSTCC_last.pth",
+    "--epochs",
+    "300",
+    "--runs",
+    "5",
+    "--is_finetuning",
+    "1",
+    "--seed",
+    "20"
+  ],
+  "program": "/home/labic/Documentos/rafael-silva/ssl-multidomain/finetuning.py",
+  "codePath": "finetuning.py",
+  "git": {
+    "remote": "git@github.com:adilsonmedronha/ssl.git",
+    "commit": "f8916543a0720971fc7b4bbbf4a2ce469d62368a"
+  },
+  "email": "rafael.csilva@usp.br",
+  "root": "/home/labic/Documentos/rafael-silva/ssl-multidomain",
+  "host": "pop-os",
+  "executable": "/home/labic/miniconda3/envs/ssl-multidomain/bin/python",
+  "codePathLocal": "finetuning.py",
+  "cpu_count": 8,
+  "cpu_count_logical": 16,
+  "gpu": "NVIDIA GeForce RTX 3060",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "997466697728",
+      "used": "426654715904"
+    }
+  },
+  "memory": {
+    "total": "16654565376"
+  },
+  "cpu": {
+    "count": 8,
+    "countLogical": 16
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 3060",
+      "memoryTotal": "12884901888",
+      "cudaCores": 3584,
+      "architecture": "Ampere"
+    }
+  ],
+  "cudaVersion": "12.5"
+}
