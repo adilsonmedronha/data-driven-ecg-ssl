@@ -1,31 +1,27 @@
+import os
 import torch
 from torch import nn
 from torch.nn import functional as F
 
-from sklearn.metrics import accuracy_score, f1_score
-from models.heads.FCN import FCN
-from models.heads.MLP import MLP
-from models.heads.Hinception import HinceptionTime
-from mine_utils import load_fragment_dataset
-from torchsummary import summary
-import os
+import wandb
+from models.heads.supervised.FCN import FCN
+from models.heads.supervised.MLP import MLP
+from models.heads.supervised.Hinception import HinceptionTime
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 import matplotlib.pyplot as plt
 import argparse
+import json
 
-import warnings
-warnings.filterwarnings("ignore", message="Using padding='same' with even kernel lengths.*")
 from numba.core.errors import NumbaWarning
-warnings.filterwarnings("ignore", category=NumbaWarning)
-warnings.filterwarnings("ignore", category=Warning)
 import seaborn as sns
-from mine_utils import plot_umap, tsne_embedding,  umap_embedding, set_seed, get_parser, load_fragment_dataset
+from mine_utils import set_seed, get_parser, load_fragment_dataset
 import pandas as pd
 from datetime import datetime
 
-from numba.core.errors import NumbaWarning
-import wandb
 
+import warnings
+warnings.filterwarnings("ignore", message="Using padding='same' with even kernel lengths.*")
+warnings.filterwarnings("ignore", category=Warning)
 warnings.filterwarnings(
     "ignore",
     category=NumbaWarning,
@@ -78,8 +74,9 @@ def test(model, test_loader, device, save_path, RUN_NAME='teste'):
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for dataloaders")
-    parser.add_argument("--nro_models", type=int, default=5, help="Number of models to train in parallel")
-    parser.add_argument("--num_epochs", type=int, default=5, help="Number of training epochs")
+    parser.add_argument("--num_epochs", type=int, default=300, help="Number of training epochs")
+    parser.add_argument("--lr", type=float, default=0.001, help="Learning rate")
+    parser.add_argument("--wdecay", type=float, default=0.001, help="Weight decay for optimizer")
     parser.add_argument("--runs", type=int, default=5, help="Number of experiment repetitions")
     parser.add_argument("--seed", type=int, default=42, help="Base random seed")
     parser.add_argument("--sequence_length", type=int, default=720, help="Input sequence length")
@@ -93,22 +90,23 @@ def main():
     run_output_dir = os.path.join(args.output_dir, initial_timestamp.strftime("%Y-%m-%d_%H-%M"))
     os.makedirs(run_output_dir, exist_ok=True)
     device = 'cuda'
-
     seeds = [args.seed + i for i in range(args.runs)]
-    model_params = {HinceptionTime: {'sequence_length': 720, 'in_channels': 1, 'num_classes': 6},
+    model_params = {  HinceptionTime: {'sequence_length': 720, 'in_channels': 1, 'num_classes': 6},
                       FCN: {'in_dim': 1, 'num_classes': 6},
-                      MLP: {'in_dim': 720, 'hidden_dim': 500, 'output_size': 6}}
+                      MLP: {'in_dim': 720, 'hidden_dim': 500, 'output_size': 6}  }
     
     configs = {
-        'lr': 0.001,
-        'weight_decay': 0,
-        'num_epochs': 1,
-        'batch_size': 32,
+        'lr': args.lr,
+        'weight_decay': args.wdecay,
+        'num_epochs': args.num_epochs,
+        'batch_size': args.batch_size,
         'scheduler': torch.optim.lr_scheduler.ReduceLROnPlateau,
         'sched_params': {'mode': 'min', 'factor': 0.1, 'patience': 10, 'min_lr': 0},
         'loss': nn.CrossEntropyLoss(),
         'optimizer': torch.optim.Adam,
     }
+
+    print(configs)
 
     for idx, model in enumerate(model_params):
         set_seed(seeds[idx])
@@ -142,6 +140,25 @@ def main():
             })
             df.to_csv(csv_path, mode='a', header=False, index=False)
         wandb.finish()
+
+        configs_bkp = configs.copy()
+        del configs_bkp['sched_params']
+        del configs_bkp['loss']
+        del configs_bkp['optimizer']
+        del configs_bkp['scheduler']
+
+        full_config = {
+            'configs': configs_bkp,
+            'dataset': 'fragment',
+            'runs': args.runs,
+            'seed': args.seed,
+            'sequence_length': args.sequence_length,
+            'output_dir': run_output_dir
+        }
+        
+        full_config_path = os.path.join(curr_run_output_dir, "full_config.json")
+        with open(full_config_path, "w") as f:
+            json.dump(full_config, f, indent=4)
 
 if __name__ == "__main__":
     main()

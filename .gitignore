@@ -9,7 +9,6 @@ Dataset/Benchmarks/**/*.pt
 
 # temporary
 wandb/
-Results
 .vscode/
 summary
 

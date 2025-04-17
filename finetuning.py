@@ -17,15 +17,13 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
-from mine_utils import plot_umap, select_head,  umap_embedding, set_seed, get_parser, load_fragment_dataset
+from mine_utils import plot_umap, select_head,  umap_embedding, set_seed, get_parser, parser_to_json, load_fragment_dataset
 
 import torch
 torch.cuda.empty_cache()
 
 import warnings
 warnings.filterwarnings("ignore")
-
-
 
 
 def train(head_model, ssl_model, head_optimizer, ssl_optimizer, loss_module, train_loader, device, is_finetuning=True):
@@ -68,7 +66,7 @@ def val(head_model, ssl_model, val_loader: DataLoader, loss_module, device='cuda
             val_loss.append(loss.item())
     
     avg_val_loss = sum(val_loss) / len(val_loss)
-    return avg_val_loss
+    return avg_val_loss, val_loss
 
 def test(head_model, ssl_model, test_loader, loss_module, device, save_path):
     head_model.eval()
@@ -119,8 +117,7 @@ def run(run_idx, epochs, head_model,
         head_optimizer, 
         ssl_optimizer, loss_module, train_loader, val_loader, save_path, device='cuda', is_finetuning=False):
     print(head_config.get('wandb_project', 'default_project'))
-    best_val_loss = float('inf')
-    # TODO SAVE UMAP OF TH EBEST RUN
+    best_avg_val_loss = float('inf')
     umap_ssl_emb_before, train_labels = umap_embedding(ssl_model, 
                                                        train_loader, 
                                                        device, 
@@ -135,18 +132,18 @@ def run(run_idx, epochs, head_model,
                            ssl_model, 
                            head_optimizer, 
                            ssl_optimizer, loss_module, train_loader, device, is_finetuning)
-        val_loss = val(head_model, ssl_model, val_loader, loss_module, device)
+        avg_val_loss, val_loss = val(head_model, ssl_model, val_loader, loss_module, device)
 
         wandb.log({
             f"train_loss/run_{run_idx}": train_loss,
+            f"avg_val_loss/run_{run_idx}": avg_val_loss,
             f"val_loss/run_{run_idx}": val_loss,
             f"step/run_{run_idx}": epoch  
         })
-        
-        print(f'Epoch: {epoch+1}/{epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
+        print(f'Epoch: {epoch+1}/{epochs}, Train Loss: {train_loss:.4f}, Val Loss: {avg_val_loss:.4f}')
     
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        if avg_val_loss < best_avg_val_loss:
+            best_avg_val_loss = avg_val_loss
             best_head_model = head_model
     
     umap_ssl_emb_after_finetuning, _  = umap_embedding(ssl_model, 
@@ -175,7 +172,7 @@ def run(run_idx, epochs, head_model,
                "umap_mlp_after": fig_umap_mlp_after})
 
     return {
-        "val_loss": best_val_loss,
+        "best_avg_val_loss": best_avg_val_loss,
         "head_model": best_head_model,
         "ssl_model": ssl_model,
     }
@@ -192,7 +189,6 @@ if __name__ == '__main__':
     with open(args.head_configuration_file, 'r') as f:
         head_config = json.load(f)
 
-    # TODO save args as json file
     device = head_config['gpu']
     N_EXPERIMENTS = args.runs
 
@@ -219,7 +215,7 @@ if __name__ == '__main__':
     
     # ------------------------------------------------ Create output dir ------------------------------------------------
     initial_timestamp = datetime.now()
-    output_dir = os.path.join("Results", "Pos_training", initial_timestamp.strftime("%Y-%m-%d_%H-%M"))
+    output_dir = os.path.join("Results", "Pos_training", args.folder_name, initial_timestamp.strftime("%Y-%m-%d_%H-%M"))
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
 
@@ -263,18 +259,17 @@ if __name__ == '__main__':
             "recall": [results['recall']],
             "precision": [results['precision']],
         })
-
         df.to_csv(csv_path, mode='a', header = not pd.io.common.file_exists(csv_path), index=False)
 
     # save the best model among the five runs
-    best_ssl_and_head = min(models, key=lambda x: x['val_loss'])
+    best_ssl_and_head = min(models, key=lambda x: x['best_avg_val_loss'])
     torch.save(best_ssl_and_head['head_model'].state_dict(), 
                os.path.join(output_dir, f'{RUN_NAME}_best_head_model_across_all_loss_validation.pth'))
     
     torch.save(best_ssl_and_head['ssl_model'].state_dict(),  
                os.path.join(output_dir, f'{RUN_NAME}_ssl_model_weights.pth'))
     
-    # TODO salvar ou nao no dir do experimento
     head_config_path = os.path.join(output_dir, f'{RUN_NAME}_head_config.json')
     encoder_config_path = os.path.join(output_dir, f'{RUN_NAME}_encoder_config.json')
+    parser_to_json(output_dir, parser)
     wandb.finish()

@@ -11,9 +11,9 @@ import random
 import numpy as np
 import argparse
 from torch.utils.data import TensorDataset, DataLoader
-from models.heads.MLP import MLP
-from models.heads.FCN import FCN
-
+from models.heads.finetuning.MLP import MLP
+from models.heads.finetuning.FCN import FCN
+import json
 
 
 def select_head(head_model, head_config):
@@ -113,7 +113,6 @@ def tsne_embedding(model, dataloader, device, head_model=None, mtype='ssl', name
                   init='pca', random_state=10, perplexity=3).fit_transform(train_emb.numpy())
     return X_embedded, train_labels
 
-
 def set_seed(seed: int = 1234):
     random.seed(seed)
     np.random.seed(seed)
@@ -123,18 +122,29 @@ def set_seed(seed: int = 1234):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
+
+
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_name', type=str, help='Name of the head model to use', required=True)
+    parser.add_argument('--folder_name', type=str, help='Path to save experiments', required=True)
     parser.add_argument('--description', type=str, help='Description of the experiment', required=True)
     parser.add_argument('--head_configuration_file', type=str, help='Path to the configuration file', required=True)
     parser.add_argument('--encoder_configuration_file', type=str, help='Path to the configuration file', required=True)
     parser.add_argument('--runs', type=int, default=5, help='Number of runs for the experiment')
-    parser.add_argument('--epochs', type=int, default=10, help='Number of epochs to train the head model')
+    parser.add_argument('--epochs', type=int, default=300, help='Number of epochs to train the head model')
     parser.add_argument('--encoder_checkpoint_path', type=str, help='Path to the encoder checkpoint file', required=True)
     parser.add_argument('--is_finetuning', type=int, help='set to 1 to use linear probing, 0 to train the encoder as well', required=True)
     parser.add_argument('--seed', type=int, default=10, help='Seed for random number')
     return parser
+
+def parser_to_json(output_path, parser):
+    args = parser.parse_args()
+    config_dict = vars(args) 
+    output_path = f"{output_path}/{args.model_name}_exp_config.json"
+    with open(output_path, 'w') as f:
+        json.dump(config_dict, f, indent=4)
+    print(f"Configuration saved to {output_path}")
 
 def load_fragment_dataset(batch_size):
     train_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/train.pt')
