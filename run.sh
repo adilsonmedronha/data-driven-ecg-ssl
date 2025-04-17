@@ -2,7 +2,7 @@
 
 models=("MLP" "FCN")
 n_runs=5
-n_epochs=30
+n_epochs=300
 
 for model in "${models[@]}"
 do
@@ -27,7 +27,7 @@ do
         --encoder_configuration_file Results/Pre_Training/TSTCC/2025-04-14_13-38/WESAD_TSTCC_config.json \
         --encoder_checkpoint_path Results/Pre_Training/TSTCC/2025-04-14_13-38/checkpoints/WESAD_pretrained_TSTCC_last.pth \
         --epochs $n_epochs \
-        --runs 1 \
+        --runs $n_runs \
         --is_finetuning 1 \
         --seed 20
 

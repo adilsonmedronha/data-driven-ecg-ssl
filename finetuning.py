@@ -211,7 +211,6 @@ if __name__ == '__main__':
     
     # ----------------------------------------------- Configure the Wandb -----------------------------------------------
     RUN_NAME = args.description
-    # HEAD_TYPE = "mlp"
     wandb.init(project='ssl_pretrained_on_multidomain_dataset',
            entity='labic-icmc',
            name= RUN_NAME)
