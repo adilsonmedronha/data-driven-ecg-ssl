@@ -99,6 +99,9 @@ class TS2Vec:
 
     def state_dict(self):
         return self.net.state_dict()
+    
+    def parameters(self):
+        return self.net.parameters()
 
 
     def fit_ssl(self, 
@@ -269,7 +272,7 @@ class TS2Vec:
         return embedding
     
 
-    def encode(self, data, rearrange=True):
+    def linear_prob(self, data, rearrange=True):
         '''Compute representations using the model
 
         Args:
@@ -290,7 +293,7 @@ class TS2Vec:
         if rearrange: # (B, T, C) -> (B, C, T) 
             repr = torch.permute(repr, (0, 2, 1)) 
         
-        return repr
+        return repr.squeeze()
     
 
     def _encode(self, data, mask=None, encoding_window=None, causal=False, sliding_length=None, sliding_padding=0, batch_size=None):
@@ -414,5 +417,5 @@ class TS2Vec:
         self.net.load_state_dict(state_dict)
     
 
-    def load_state_dict(self, state_dict):
-        self.net.load_state_dict(state_dict)
+    def load_state_dict(self, state_dict, **kwargs):
+        self.net.load_state_dict(state_dict, **kwargs)

@@ -1,0 +1,16 @@
+{"time":"2025-04-17T14:47:09.946372417-03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/home/rcsilva/Documentos/models/ssl-multidomain/wandb/run-20250417_144709-qn5mh6cw/logs/debug-core.log"}
+{"time":"2025-04-17T14:47:10.253848465-03:00","level":"INFO","msg":"created new stream","id":"qn5mh6cw"}
+{"time":"2025-04-17T14:47:10.253900715-03:00","level":"INFO","msg":"stream: started","id":"qn5mh6cw"}
+{"time":"2025-04-17T14:47:10.253931443-03:00","level":"INFO","msg":"writer: Do: started","stream_id":"qn5mh6cw"}
+{"time":"2025-04-17T14:47:10.254398785-03:00","level":"INFO","msg":"sender: started","stream_id":"qn5mh6cw"}
+{"time":"2025-04-17T14:47:10.254418492-03:00","level":"INFO","msg":"handler: started","stream_id":"qn5mh6cw"}
+{"time":"2025-04-17T14:47:10.532872084-03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-17T14:55:14.048265236-03:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-17T14:55:14.048342704-03:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-17T14:55:14.979123119-03:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-17T14:55:15.049786904-03:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading history steps 1515-1519, summary, console lines 1504-1505","runtime_seconds":0.070559265}],"total_operations":1}}
+{"time":"2025-04-17T14:55:15.237276134-03:00","level":"INFO","msg":"stream: closing","id":"qn5mh6cw"}
+{"time":"2025-04-17T14:55:15.237307544-03:00","level":"INFO","msg":"handler: closed","stream_id":"qn5mh6cw"}
+{"time":"2025-04-17T14:55:15.237322512-03:00","level":"INFO","msg":"writer: Close: closed","stream_id":"qn5mh6cw"}
+{"time":"2025-04-17T14:55:15.237330317-03:00","level":"INFO","msg":"sender: closed","stream_id":"qn5mh6cw"}
+{"time":"2025-04-17T14:55:15.237449535-03:00","level":"INFO","msg":"stream: closed","id":"qn5mh6cw"}

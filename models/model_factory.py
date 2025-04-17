@@ -1,6 +1,7 @@
 import logging
 from models.Series2Vec import Series2Vec
 from models.TSTCC import Encoder as TSTCC_encoder
+from models.TS2Vec import TS2Vec
 
 
 logger = logging.getLogger('__main__')
@@ -20,10 +21,8 @@ def Model_factory(config, data):
     if config['Model_Type'] == 'TSTCC':
         model = TSTCC_encoder(**config['model_args']['encoder'])
 
-    # if config['Model_Type'] == 'TF_C':
-    #     model = TF_C.TF_C(config, num_classes=config['num_labels'])
-    
-
+    if config['Model_Type'] == 'TS2Vec':
+        model = TS2Vec(**config['model_args'])    
 
     logger.info("Model:\n{}".format(model))
     logger.info("Total number of parameters: {}".format(count_parameters(model)))

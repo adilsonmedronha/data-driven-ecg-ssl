@@ -1,0 +1,16 @@
+{"time":"2025-04-17T14:19:27.225777176-03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/home/rcsilva/Documentos/models/ssl-multidomain/wandb/run-20250417_141927-au034z6i/logs/debug-core.log"}
+{"time":"2025-04-17T14:19:27.543462731-03:00","level":"INFO","msg":"created new stream","id":"au034z6i"}
+{"time":"2025-04-17T14:19:27.544244853-03:00","level":"INFO","msg":"stream: started","id":"au034z6i"}
+{"time":"2025-04-17T14:19:27.544287694-03:00","level":"INFO","msg":"writer: Do: started","stream_id":"au034z6i"}
+{"time":"2025-04-17T14:19:27.54432229-03:00","level":"INFO","msg":"handler: started","stream_id":"au034z6i"}
+{"time":"2025-04-17T14:19:27.544345224-03:00","level":"INFO","msg":"sender: started","stream_id":"au034z6i"}
+{"time":"2025-04-17T14:19:27.805896481-03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-17T14:22:57.971721247-03:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-17T14:22:57.971820987-03:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-17T14:22:58.932951451-03:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading output.log","runtime_seconds":0.312097584,"progress":"77.3KB/77.3KB"},{"desc":"uploading config.yaml","runtime_seconds":0.131167456,"progress":"1.9KB/1.9KB"}],"total_operations":2}}
+{"time":"2025-04-17T14:22:59.140040742-03:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-17T14:22:59.407277215-03:00","level":"INFO","msg":"stream: closing","id":"au034z6i"}
+{"time":"2025-04-17T14:22:59.407305058-03:00","level":"INFO","msg":"handler: closed","stream_id":"au034z6i"}
+{"time":"2025-04-17T14:22:59.407318444-03:00","level":"INFO","msg":"writer: Close: closed","stream_id":"au034z6i"}
+{"time":"2025-04-17T14:22:59.40734276-03:00","level":"INFO","msg":"sender: closed","stream_id":"au034z6i"}
+{"time":"2025-04-17T14:22:59.407390461-03:00","level":"INFO","msg":"stream: closed","id":"au034z6i"}
