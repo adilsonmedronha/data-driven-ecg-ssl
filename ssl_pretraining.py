@@ -40,6 +40,9 @@ if __name__ == '__main__':
     # ------------------------------------------- Pretrain TS2Vec -------------------------------------------
     elif config['Model_Type'] == 'TS2Vec':
         for problem in os.listdir(config['data_dir']):
+            if problem != 'WESAD_8second':
+                continue
+            
             config['problem'] = problem
             print(problem)
             
