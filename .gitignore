@@ -11,6 +11,8 @@ Dataset/Benchmarks/**/*.pt
 wandb/
 .vscode/
 summary
+nohup*.out
+Results/Pre_Training/Benchmarks
 
 
 # Byte-compiled / optimized / DLL files
