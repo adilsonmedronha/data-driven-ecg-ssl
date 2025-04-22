@@ -7,9 +7,12 @@
     "gpu": 0,
     "batch_size": 64,
     "optim_args": {
-        "lr": 3e-4,
-        "betas": [0.9, 0.999],
-        "weight_decay": 3e-4
+        "lr": 0.0003,
+        "betas": [
+            0.9,
+            0.999
+        ],
+        "weight_decay": 0.0003
     },
     "model_args": {
         "encoder": {
@@ -33,5 +36,7 @@
             "jitter_ratio": 0.38,
             "max_seg": 12
         }
-    }
+    },
+    "epochs": 600,
+    "problem": "WESAD_ECGonly_8second"
 }

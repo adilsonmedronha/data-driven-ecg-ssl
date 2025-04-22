@@ -163,3 +163,25 @@ def load_fragment_dataset(batch_size):
                                             batch_size, shuffle=False)
     
     return train_loader, test_loader, val_loader
+
+
+def load_ieeeppg_dataset(batch_size: int):
+    train_data = torch.load('Dataset/IEEEPPG/train.pt', weights_only=False)
+    test_data = torch.load('Dataset/IEEEPPG/test.pt', weights_only=False)
+    val_data = torch.load('Dataset/IEEEPPG/val.pt', weights_only=False)
+
+    x_train_data, y_train_data = train_data['samples'], train_data['labels']
+    x_test_data, y_test_data = test_data['samples'], test_data['labels']
+    x_val_data, y_val_data = val_data['samples'], val_data['labels']
+
+    print(x_train_data.shape, x_train_data.dtype)
+    print(y_train_data.shape, y_train_data.dtype)
+
+    train_loader = DataLoader(TensorDataset(x_train_data, y_train_data), 
+                                            batch_size, shuffle=False)
+    test_loader = DataLoader(TensorDataset(x_test_data, y_test_data), 
+                                            batch_size, shuffle=False)
+    val_loader = DataLoader(TensorDataset(x_val_data, y_val_data), 
+                                            batch_size, shuffle=False)
+    
+    return train_loader, test_loader, val_loader
