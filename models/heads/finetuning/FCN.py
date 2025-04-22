@@ -25,7 +25,6 @@ class FCN(nn.Module):
         ])
         
         self.linear = nn.Linear(in_features=128, out_features=1 if num_classes == 2 else num_classes)
-        self.criteria = nn.CrossEntropyLoss() if num_classes > 2 else nn.BCEWithLogitsLoss()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.unsqueeze(1) if x.ndim < 3 else x

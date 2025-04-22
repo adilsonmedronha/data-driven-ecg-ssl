@@ -40,8 +40,8 @@ def train(head_model, ssl_model, head_optimizer, ssl_optimizer, loss_module, tra
         with torch.set_grad_enabled(is_finetuning):
             z_emb = ssl_model.linear_prob(x)
             
-        y_hat = head_model(z_emb)
-        loss = loss_module(y_hat, y)
+        logit = head_model(z_emb)
+        loss = loss_module(logit, y)
         loss.backward()
         head_optimizer.step()
 
