@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 
-import torch.nn.functional as F
 
 class FCN(nn.Module):
 
@@ -24,8 +23,7 @@ class FCN(nn.Module):
             nn.ReLU(),
         ])
         
-        self.linear = nn.Linear(in_features=128, out_features=1 if num_classes == 2 else num_classes)
-        self.criteria = nn.CrossEntropyLoss() if num_classes > 2 else nn.BCEWithLogitsLoss()
+        self.linear = nn.Linear(in_features=128, out_features=num_classes if num_classes > 2 else 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.unsqueeze(1) if x.ndim < 3 else x

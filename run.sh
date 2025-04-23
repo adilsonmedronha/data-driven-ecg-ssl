@@ -1,8 +1,9 @@
 #!/bin/bash
 
 models=("MLP" "FCN")
-n_runs=5
-n_epochs=300
+n_runs=1
+n_epochs=30
+folder_name="TS2Vec_ieeppg"
 
 for model in "${models[@]}"
 do
@@ -14,6 +15,7 @@ do
         --head_configuration_file "Configs/${model}_headmodel.json" \
         --encoder_configuration_file Results/Pre_Training/TS2Vec/2025-04-15_16-04/WESAD_TS2Vec_config.json \
         --encoder_checkpoint_path Results/Pre_Training/TS2Vec/2025-04-15_16-04/checkpoints/WESAD_pretrained_TS2Vec_best.pth \
+        --folder_name $folder_name \
         --epochs $n_epochs \
         --runs $n_runs \
         --is_finetuning 0 \
@@ -26,6 +28,7 @@ do
         --head_configuration_file "Configs/${model}_headmodel.json" \
         --encoder_configuration_file Results/Pre_Training/TS2Vec/2025-04-15_16-04/WESAD_TS2Vec_config.json \
         --encoder_checkpoint_path Results/Pre_Training/TS2Vec/2025-04-15_16-04/checkpoints/WESAD_pretrained_TS2Vec_best.pth \
+        --folder_name $folder_name \
         --epochs $n_epochs \
         --runs $n_runs \
         --is_finetuning 1 \
@@ -38,6 +41,7 @@ do
         --head_configuration_file "Configs/${model}_headmodel.json" \
         --encoder_configuration_file Results/Pre_Training/TS2Vec/2025-04-15_16-04/WESAD_ECGonly_TS2Vec_config.json \
         --encoder_checkpoint_path Results/Pre_Training/TS2Vec/2025-04-15_16-04/checkpoints/WESAD_ECGonly_pretrained_TS2Vec_best.pth \
+        --folder_name $folder_name \
         --epochs $n_epochs \
         --runs $n_runs \
         --is_finetuning 0 \
@@ -50,6 +54,7 @@ do
         --head_configuration_file "Configs/${model}_headmodel.json" \
         --encoder_configuration_file Results/Pre_Training/TS2Vec/2025-04-15_16-04/WESAD_ECGonly_TS2Vec_config.json \
         --encoder_checkpoint_path Results/Pre_Training/TS2Vec/2025-04-15_16-04/checkpoints/WESAD_ECGonly_pretrained_TS2Vec_best.pth \
+        --folder_name $folder_name \
         --epochs $n_epochs \
         --runs $n_runs \
         --is_finetuning 1 \

@@ -18,15 +18,27 @@ import json
 
 def select_head(head_model, head_config):
     if head_model == "MLP":
-        in_dim, hidden_dim, output_size = head_config["layers_config"]
-        model = MLP(in_dim, hidden_dim, output_size)
+        in_dim, hidden_dim, num_classes = head_config["layers_config"]
+        model = MLP(in_dim, hidden_dim, num_classes)
     elif head_model == "FCN":
-        in_dim, out_dim = head_config["layers_config"]
-        model = FCN(in_dim, out_dim)
+        in_dim, num_classes = head_config["layers_config"]
+        model = FCN(in_dim, num_classes)
 
     model.to(head_config['gpu'])
+
+    # Set the optimizer
     adam_optimizer = torch.optim.Adam(model.parameters(), lr=head_config['lr'])
-    criterion = nn.CrossEntropyLoss()
+    
+    # Use CrossEntropyLoss for multi-class classification 
+    if num_classes > 2:
+        criterion = nn.CrossEntropyLoss() 
+    # BCEWithLogitsLoss for binary classification
+    elif num_classes == 2:
+        criterion = nn.BCEWithLogitsLoss()
+    # MSE loss for regression tasks, when num_classes is 1
+    else:
+        criterion = nn.MSELoss()
+
     return model, adam_optimizer, criterion
 
 
@@ -119,7 +131,7 @@ def set_seed(seed: int = 1234):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed) 
-    torch.backends.cudnn.deterministic = True
+    # torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
 
@@ -146,42 +158,25 @@ def parser_to_json(output_path, parser):
         json.dump(config_dict, f, indent=4)
     print(f"Configuration saved to {output_path}")
 
-def load_fragment_dataset(batch_size):
-    train_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/train.pt')
-    test_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/test.pt')
-    val_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/val.pt')
 
-    x_train_data, y_train_data = train_data['samples'], train_data['labels']
-    x_test_data, y_test_data = test_data['samples'], test_data['labels']
-    x_val_data, y_val_data = val_data['samples'], val_data['labels']
+def load_task_dataset(batch_size, dataset_name):
 
-    train_loader = DataLoader(TensorDataset(x_train_data, y_train_data), 
-                                            batch_size, shuffle=False)
-    test_loader = DataLoader(TensorDataset(x_test_data, y_test_data), 
-                                            batch_size, shuffle=False)
-    val_loader = DataLoader(TensorDataset(x_val_data, y_val_data), 
-                                            batch_size, shuffle=False)
-    
-    return train_loader, test_loader, val_loader
+    if dataset_name == 'Fragment':
+        train_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/train.pt')
+        test_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/test.pt')
+        val_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/val.pt')
+
+    elif dataset_name in ['IEEEPPG', 'IEEEPPG-multivar']:
+        train_data = torch.load(f'Dataset/{dataset_name}/train.pt', weights_only=False)
+        test_data = torch.load(f'Dataset/{dataset_name}/test.pt', weights_only=False)
+        val_data = torch.load(f'Dataset/{dataset_name}/val.pt', weights_only=False)
 
 
-def load_ieeeppg_dataset(batch_size: int):
-    train_data = torch.load('Dataset/IEEEPPG/train.pt', weights_only=False)
-    test_data = torch.load('Dataset/IEEEPPG/test.pt', weights_only=False)
-    val_data = torch.load('Dataset/IEEEPPG/val.pt', weights_only=False)
-
-    x_train_data, y_train_data = train_data['samples'], train_data['labels']
-    x_test_data, y_test_data = test_data['samples'], test_data['labels']
-    x_val_data, y_val_data = val_data['samples'], val_data['labels']
-
-    print(x_train_data.shape, x_train_data.dtype)
-    print(y_train_data.shape, y_train_data.dtype)
-
-    train_loader = DataLoader(TensorDataset(x_train_data, y_train_data), 
-                                            batch_size, shuffle=False)
-    test_loader = DataLoader(TensorDataset(x_test_data, y_test_data), 
-                                            batch_size, shuffle=False)
-    val_loader = DataLoader(TensorDataset(x_val_data, y_val_data), 
-                                            batch_size, shuffle=False)
+    train_loader = DataLoader(TensorDataset(train_data['samples'], train_data['labels']),
+                              batch_size, shuffle=False)
+    test_loader = DataLoader(TensorDataset(test_data['samples'], test_data['labels']),
+                             batch_size, shuffle=False)
+    val_loader = DataLoader(TensorDataset(val_data['samples'], val_data['labels']),
+                            batch_size, shuffle=False)
     
     return train_loader, test_loader, val_loader

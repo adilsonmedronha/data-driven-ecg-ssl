@@ -1,23 +1,16 @@
 import torch
 import os
 import json
+import wandb
+import pandas as pd
+from datetime import datetime
 from models.Series2Vec.S2V_training import *
 from utils.utils import load_model
 from models.model_factory import Model_factory
 from Dataset import dataloader
-from models.optimizers import get_optimizer, get_loss_module
-from torch.utils.data import DataLoader
-from sklearn.metrics import confusion_matrix
-from datetime import datetime
-from torch.utils.data import DataLoader
-import wandb
-import torch
-import torch.nn.functional as F
-import pandas as pd
-from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
-import seaborn as sns
-import matplotlib.pyplot as plt
-from mine_utils import plot_umap, select_head,  umap_embedding, set_seed, get_parser, parser_to_json, load_fragment_dataset
+from models.optimizers import get_optimizer
+from mine_utils import select_head, set_seed, get_parser, load_task_dataset
+from utils import task_trainer
 
 import torch
 torch.cuda.empty_cache()
@@ -26,113 +19,32 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-def train(head_model, ssl_model, head_optimizer, ssl_optimizer, loss_module, train_loader, device, is_finetuning=True):
-    head_model.train() 
-    ssl_model.train() if is_finetuning else ssl_model.eval()
-    epoch_loss = []
-    is_finetuning = bool(is_finetuning)
-    for (x, y) in train_loader:
-        x, y = x.to(device), y.to(device)
-        head_optimizer.zero_grad()
-        if is_finetuning:
-            ssl_optimizer.zero_grad()
-        
-        with torch.set_grad_enabled(is_finetuning):
-            z_emb = ssl_model.linear_prob(x)
-            
-        y_hat = head_model(z_emb)
-        loss = loss_module(y_hat, y)
-        loss.backward()
-        head_optimizer.step()
+def save_json(dict, file_path):
+    with open(file_path, 'w') as f:
+        json.dump(dict, f, indent=4)
+    print(f"Configuration saved to {file_path}")
 
-        if is_finetuning:
-            ssl_optimizer.zero_grad()
-        epoch_loss.append(loss.item())
-    
-    avg_loss = sum(epoch_loss) / len(epoch_loss)
-    return avg_loss
 
-def val(head_model, ssl_model, val_loader: DataLoader, loss_module, device='cuda'):
-    head_model.eval()
-    ssl_model.eval()
-    val_loss = []
-    
-    with torch.no_grad():
-        for x, y in val_loader:
-            x, y = x.to(device), y.to(device)
-            z_emb = ssl_model.linear_prob(x)
-            y_hat = head_model(z_emb)
-            loss = loss_module(y_hat, y)
-            val_loss.append(loss.item())
-    
-    avg_val_loss = sum(val_loss) / len(val_loss)
-    return avg_val_loss, val_loss
-
-def test(head_model, ssl_model, test_loader, loss_module, device, save_path):
-    head_model.eval()
-    ssl_model.eval()
-    test_loss = []
-    all_preds = []
-    all_labels = []
-    
-    with torch.no_grad():
-        for x, y in test_loader:
-            x, y = x.to(device), y.to(device)
-            z_emb = ssl_model.linear_prob(x)
-            y_hat = head_model(z_emb)
-            loss = loss_module(y_hat, y)
-            test_loss.append(loss.item())
-            
-            preds = torch.argmax(F.softmax(y_hat, dim=1), dim=1)
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(y.cpu().numpy())
-    
-    avg_test_loss = sum(test_loss) / len(test_loss)
-    acc = accuracy_score(all_labels, all_preds)
-    f1 = f1_score(all_labels, all_preds, average='weighted')
-    recall = f1_score(all_labels, all_preds, average='macro')
-    precision = f1_score(all_labels, all_preds, average='micro')
-    conf_matrix = confusion_matrix(all_labels, all_preds)
-    
-    results = {
-        "avg_loss": avg_test_loss,
-        "accuracy": acc,
-        "f1_score": f1,
-        "recall": recall,
-        "precision": precision,
-        "confusion_matrix": conf_matrix
-    }
-
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=True, xticklabels=range(6), yticklabels=range(6))
-    plt.title('Confusion Matrix')
-    plt.xlabel('Predicted Label')
-    plt.ylabel('True Label')
-    plt.savefig(os.path.join(save_path, f"confusion_matrix_{RUN_NAME}.pdf"))
-    plt.close()
-    return results
-
-def run(run_idx, epochs, head_model, 
-        ssl_model, 
-        head_optimizer, 
+def run(run_idx, epochs, head_model, ssl_model, head_optimizer, 
         ssl_optimizer, loss_module, train_loader, val_loader, save_path, device='cuda', is_finetuning=False):
     print(head_config.get('wandb_project', 'default_project'))
     best_avg_val_loss = float('inf')
-    umap_ssl_emb_before, train_labels = umap_embedding(ssl_model, 
-                                                       train_loader, 
-                                                       device, 
-                                                       mtype= 'ssl', 
-                                                       name = f'UMAP_encoder_before_{RUN_NAME}', save_path=save_path)
-    fig_umap_before = plot_umap(umap_ssl_emb_before, 
-                                train_labels, 
-                                name = f"UMAP SSL BEFORE {RUN_NAME}",
-                                save_path=os.path.join(save_path, f"UMAP_encoder_before_{RUN_NAME}.pdf"))
+
+    fig_umap_before = task_trainer.plot_embedding_with_umap(
+        ssl_model=ssl_model,
+        train_loader=train_loader,
+        device=device,
+        save_path=save_path,
+        filename=f"UMAP_encoder_before_{RUN_NAME}",
+        title=f"UMAP SSL BEFORE {RUN_NAME}",
+    )
+
     for epoch in range(epochs): 
-        train_loss = train(head_model,
+        train_loss = task_trainer.train(head_model,
                            ssl_model, 
                            head_optimizer, 
                            ssl_optimizer, loss_module, train_loader, device, is_finetuning)
-        avg_val_loss, val_loss = val(head_model, ssl_model, val_loader, loss_module, device)
+        avg_val_loss, val_loss = task_trainer.val(head_model, ssl_model, val_loader, loss_module, device)
 
         wandb.log({
             f"train_loss/run_{run_idx}": train_loss,
@@ -145,27 +57,26 @@ def run(run_idx, epochs, head_model,
         if avg_val_loss < best_avg_val_loss:
             best_avg_val_loss = avg_val_loss
             best_head_model = head_model
+            best_ssl_model = ssl_model
     
-    umap_ssl_emb_after_finetuning, _  = umap_embedding(ssl_model, 
-                                                       train_loader, 
-                                                       device, mtype='ssl', 
-                                                       name = f'UMAP_encoder_after_{RUN_NAME}', save_path=save_path)
-    
-    fig_umap_after = plot_umap(umap_ssl_emb_after_finetuning, 
-                               train_labels, 
-                               name = f"UMAP SSL AFTER {RUN_NAME}",
-                               save_path = os.path.join(save_path, f"UMAP_encoder_after_{RUN_NAME}.pdf"))
-    
-    umap_head_emb_after_finetuning, _ = umap_embedding(ssl_model, 
-                                                       train_loader, 
-                                                       device, head_model, 
-                                                       mtype=head_model._get_name(), 
-                                                       name = f'UMAP_head_after_{RUN_NAME}', save_path=save_path)
-    
-    fig_umap_mlp_after = plot_umap(umap_head_emb_after_finetuning, 
-                                   train_labels, 
-                                   name = f"UMAP {head_model._get_name()} BEFORE {RUN_NAME}",
-                                   save_path = os.path.join(save_path, f"UMAP_head_after_{RUN_NAME}.pdf"))
+    fig_umap_after = task_trainer.plot_embedding_with_umap(
+        ssl_model=best_ssl_model,
+        train_loader=train_loader,
+        device=device,
+        save_path=save_path,
+        filename=f"UMAP_encoder_after_{RUN_NAME}",
+        title=f"UMAP SSL AFTER {RUN_NAME}",
+    )
+
+    fig_umap_mlp_after = task_trainer.plot_embedding_with_umap(
+        ssl_model=best_ssl_model,
+        head_model=best_head_model,
+        train_loader=train_loader,
+        device=device,
+        save_path=save_path,
+        filename=f"UMAP_head_after_{RUN_NAME}",
+        title=f"UMAP {best_head_model._get_name()} BEFORE {RUN_NAME}",
+    )
     
     wandb.log({"umap_before": fig_umap_before, 
                "umap_after": fig_umap_after, 
@@ -197,14 +108,10 @@ if __name__ == '__main__':
     DataWhereS2VwereTrained = dataloader.data_loader(encoder_config)
     model = Model_factory(encoder_config, DataWhereS2VwereTrained)
     encoder_config['optimizer'] = get_optimizer("RAdam", model, encoder_config)
-    encoder_config['loss_module'] = get_loss_module()
     model.to(encoder_config['gpu'])
     SS_Encoder, optimizer, start_epoch = load_model(model, path2load_encoder, encoder_config['Model_Type'], encoder_config['optimizer'])
     SS_Encoder.to(encoder_config['gpu'])
 
-    # ----------------------------------------------- Load Target dataset -----------------------------------------------
-    train_loader, val_loader, test_loader = load_fragment_dataset(batch_size = 64)
-    
     # ----------------------------------------------- Configure the Wandb -----------------------------------------------
     RUN_NAME = args.description
     wandb.init(project='ssl_pretrained_on_multidomain_dataset',
@@ -219,11 +126,14 @@ if __name__ == '__main__':
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
 
-    df = pd.DataFrame(columns=["model", "dataset", "exp", "avg loss", "acc", "f1", "recall", "precision"])
+    df = pd.DataFrame(columns=["model", "dataset", "exp", "avg loss"]+task_trainer.metrics_name(head_config['task']))
     csv_path = os.path.join(output_dir, "results.csv")
     df.to_csv(csv_path, mode='a', header=True, index=False)
     
     # ----------------------------------------------- Run the experiment -----------------------------------------------
+    # Load Target dataset
+    train_loader, val_loader, test_loader = load_task_dataset(batch_size = 64, dataset_name = head_config['dataset'])
+
     models = []
     seeds = [args.seed + i for i in range(N_EXPERIMENTS)]
     for run_idx in range(N_EXPERIMENTS):
@@ -242,34 +152,31 @@ if __name__ == '__main__':
                             is_finetuning = args.is_finetuning)
         
         models.append(train_results)
-        results = test(head_model = head_model,
+        results = task_trainer.test(head_model = head_model,
                        ssl_model = SS_Encoder, 
                        test_loader = test_loader, 
                        loss_module = criterion,
+                       task = head_config['task'],
                        device = device,
-                       save_path = output_dir)
+                       save_path = output_dir, run_name=RUN_NAME)
         
         df = pd.DataFrame({
             "model": [RUN_NAME],
             "dataset": [head_config['dataset']],
             "exp": [run_idx],
-            "avg loss": [results["avg_loss"]],
-            "acc": [results['accuracy']],
-            "f1": [results['f1_score']],
-            "recall": [results['recall']],
-            "precision": [results['precision']],
+            **{k: [v] for k, v in results.items() if k != 'confusion_matrix'},
         })
         df.to_csv(csv_path, mode='a', header = not pd.io.common.file_exists(csv_path), index=False)
 
     # save the best model among the five runs
     best_ssl_and_head = min(models, key=lambda x: x['best_avg_val_loss'])
-    torch.save(best_ssl_and_head['head_model'].state_dict(), 
-               os.path.join(output_dir, f'{RUN_NAME}_best_head_model_across_all_loss_validation.pth'))
-    
-    torch.save(best_ssl_and_head['ssl_model'].state_dict(),  
-               os.path.join(output_dir, f'{RUN_NAME}_ssl_model_weights.pth'))
-    
-    head_config_path = os.path.join(output_dir, f'{RUN_NAME}_head_config.json')
-    encoder_config_path = os.path.join(output_dir, f'{RUN_NAME}_encoder_config.json')
-    parser_to_json(output_dir, parser)
+    torch.save(best_ssl_and_head['head_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_best_head_model_across_all_loss_validation.pth'))
+    torch.save(best_ssl_and_head['ssl_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_ssl_model_weights.pth'))
+
+    # save the config files 
+    save_json(head_config, os.path.join(output_dir, f'{RUN_NAME}_head_config.json'))
+    save_json(args.__dict__, os.path.join(output_dir, f'{RUN_NAME}_args.json'))
+
     wandb.finish()
+
+
