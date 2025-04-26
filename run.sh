@@ -1,9 +1,9 @@
 #!/bin/bash
 
 models=("MLP" "FCN")
-n_runs=1
-n_epochs=30
-folder_name="TS2Vec_ieeppg"
+n_runs=5
+n_epochs=300
+folder_name="TS2Vec_and_ieeeppg"
 
 for model in "${models[@]}"
 do

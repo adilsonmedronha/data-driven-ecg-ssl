@@ -14,7 +14,7 @@ import json
 
 from numba.core.errors import NumbaWarning
 import seaborn as sns
-from mine_utils import set_seed, get_parser, load_fragment_dataset
+from mine_utils import set_seed, get_parser, load_task_dataset
 import pandas as pd
 from datetime import datetime
 
@@ -110,7 +110,7 @@ def main():
 
     for idx, model in enumerate(model_params):
         set_seed(seeds[idx])
-        train_loader, val_loader, test_loader = load_fragment_dataset(batch_size=args.batch_size)
+        train_loader, val_loader, test_loader = load_task_dataset(batch_size=args.batch_size, dataset_name="Fragment")
         curr_model = model(**model_params[model], configs=configs)
         model_name = f'{curr_model.__class__.__name__}' if isinstance(curr_model, HinceptionTime) else f'{curr_model.__class__.__name__}'  
         curr_run_output_dir = os.path.join(run_output_dir, model_name)

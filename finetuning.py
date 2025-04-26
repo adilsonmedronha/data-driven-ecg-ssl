@@ -58,6 +58,7 @@ def run(run_idx, epochs, head_model, ssl_model, head_optimizer,
             best_avg_val_loss = avg_val_loss
             best_head_model = head_model
             best_ssl_model = ssl_model
+            best_epoch = epoch
     
     fig_umap_after = task_trainer.plot_embedding_with_umap(
         ssl_model=best_ssl_model,
@@ -78,14 +79,16 @@ def run(run_idx, epochs, head_model, ssl_model, head_optimizer,
         title=f"UMAP {best_head_model._get_name()} BEFORE {RUN_NAME}",
     )
     
+    print(f"Best epoch of this run: {best_epoch}")
     wandb.log({"umap_before": fig_umap_before, 
                "umap_after": fig_umap_after, 
                "umap_mlp_after": fig_umap_mlp_after})
 
     return {
         "best_avg_val_loss": best_avg_val_loss,
-        "head_model": best_head_model,
-        "ssl_model": ssl_model,
+        "best_head_model": best_head_model,
+        "best_ssl_model": best_ssl_model,
+        "best_epoch": best_epoch,
     }
 
 
@@ -102,15 +105,6 @@ if __name__ == '__main__':
 
     device = head_config['gpu']
     N_EXPERIMENTS = args.runs
-
-    # ------------------------------------------------- Load SSL model -------------------------------------------------
-    path2load_encoder = os.path.join(args.encoder_checkpoint_path)
-    DataWhereS2VwereTrained = dataloader.data_loader(encoder_config)
-    model = Model_factory(encoder_config, DataWhereS2VwereTrained)
-    encoder_config['optimizer'] = get_optimizer("RAdam", model, encoder_config)
-    model.to(encoder_config['gpu'])
-    SS_Encoder, optimizer, start_epoch = load_model(model, path2load_encoder, encoder_config['Model_Type'], encoder_config['optimizer'])
-    SS_Encoder.to(encoder_config['gpu'])
 
     # ----------------------------------------------- Configure the Wandb -----------------------------------------------
     RUN_NAME = args.description
@@ -134,11 +128,23 @@ if __name__ == '__main__':
     # Load Target dataset
     train_loader, val_loader, test_loader = load_task_dataset(batch_size = 64, dataset_name = head_config['dataset'])
 
+    path2load_encoder = os.path.join(args.encoder_checkpoint_path)
+    DataWhereS2VwereTrained = dataloader.data_loader(encoder_config)
+
     models = []
     seeds = [args.seed + i for i in range(N_EXPERIMENTS)]
     for run_idx in range(N_EXPERIMENTS):
         set_seed(seeds[run_idx])
+
+        # Load SSL model -------------------------------------------------
+        model = Model_factory(encoder_config, DataWhereS2VwereTrained)
+        encoder_config['optimizer'] = get_optimizer("RAdam", model, encoder_config)
+        SS_Encoder, optimizer, start_epoch = load_model(model, path2load_encoder, encoder_config['Model_Type'], encoder_config['optimizer'])
+        SS_Encoder.to(encoder_config['gpu'])
+
+        # Load SSL model -------------------------------------------------
         head_model, adam_optimizer, criterion = select_head(args.model_name, head_config)
+
         train_results = run(run_idx, 
                             epochs= args.epochs,
                             head_model = head_model, 
@@ -170,8 +176,9 @@ if __name__ == '__main__':
 
     # save the best model among the five runs
     best_ssl_and_head = min(models, key=lambda x: x['best_avg_val_loss'])
-    torch.save(best_ssl_and_head['head_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_best_head_model_across_all_loss_validation.pth'))
-    torch.save(best_ssl_and_head['ssl_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_ssl_model_weights.pth'))
+
+    torch.save(best_ssl_and_head['best_head_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_best_head_model_across_all_loss_validation.pth'))
+    torch.save(best_ssl_and_head['best_ssl_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_best_ssl_model_weights.pth'))
 
     # save the config files 
     save_json(head_config, os.path.join(output_dir, f'{RUN_NAME}_head_config.json'))
