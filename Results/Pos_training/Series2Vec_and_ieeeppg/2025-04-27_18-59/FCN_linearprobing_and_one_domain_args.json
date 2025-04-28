@@ -1,0 +1,12 @@
+{
+    "model_name": "FCN",
+    "folder_name": "Series2Vec_and_ieeeppg",
+    "description": "FCN_linearprobing_and_one_domain",
+    "head_configuration_file": "Configs/FCN_headmodel.json",
+    "encoder_configuration_file": "Results/Pre_Training/S2V/2025-03-29_07-38/WESAD_ECGonly_S2V_config.json",
+    "runs": 5,
+    "epochs": 300,
+    "encoder_checkpoint_path": "Results/Pre_Training/S2V/2025-03-29_07-38/checkpoints/WESAD_ECGonly_pretrained_model_last.pth",
+    "is_finetuning": 0,
+    "seed": 30
+}
