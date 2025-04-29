@@ -6,6 +6,8 @@ Dataset/Benchmarks/WESAD_ECGonly/WESAD_ECGonly_train.pt
 Dataset/Benchmarks/**/*.pt
 
 !Dataset/dataloader.py
+!Dataset/ieeeppg.ipynb
+!Dataset/wesad.ipynb
 
 # temporary
 wandb/
