@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix
 
 class FCN(nn.Module):
 
-    def __init__(self, in_dim: int, num_classes: int, configs) -> None:
+    def __init__(self, in_dim: int, num_classes: int, configs, seed) -> None:
         super().__init__()
         
         self.num_classes = num_classes

@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from sklearn.metrics import confusion_matrix
 
 class MLP(nn.Module):
-    def __init__(self, in_dim, hidden_dim, output_size, configs):
+    def __init__(self, in_dim, hidden_dim, output_size, configs, seed):
         super(MLP, self).__init__()
         self.logits = nn.Sequential(
             nn.Dropout(0.1),

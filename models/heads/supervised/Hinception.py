@@ -5,6 +5,7 @@ import numpy as np
 from torch.nn import functional as F
 import wandb
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from mine_utils import set_seed
 
 def noop(x: torch.Tensor) -> torch.Tensor:
     return x
@@ -199,9 +200,10 @@ class Hinception(nn.Module):
     
 
 class HinceptionTime(nn.Module):
-    def __init__(self,  configs: dict, sequence_length: int, in_channels: int, num_classes: int, num_models: int = 5) -> None:
+    def __init__(self,  configs: dict, sequence_length: int, in_channels: int, num_classes: int, num_models: int = 5, seed = 42) -> None:
         super().__init__()
         self.num_models = num_models
+        self.seed = seed
         self.models = nn.ModuleList([
             Hinception(sequence_length=sequence_length, in_channels=in_channels, num_classes=num_classes, hname=f'H{idx+1}')
             for idx in range(self.num_models)
@@ -232,6 +234,7 @@ class HinceptionTime(nn.Module):
         return argmax
     
     def run(self, train_loader, val_loader, epochs, device, run_idx=0, path=''):
+            set_seed(self.seed + 1)
             for idx, (inception, loss, opt, sched) in enumerate(zip(self.models, self.losses, self.opts, self.schedulers)):
                 min_val_loss = float('inf')
                 print(inception.__class__.__name__)

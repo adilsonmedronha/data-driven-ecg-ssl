@@ -9,5 +9,5 @@
     "runs": 5,
     "seed": 42,
     "sequence_length": 720,
-    "output_dir": "Results/Supervised/2025-04-17_17-10"
+    "output_dir": "Results/Supervised/2025-04-29_18-12"
 }
