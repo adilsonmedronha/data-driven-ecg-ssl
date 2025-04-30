@@ -111,9 +111,7 @@ class TS2Vec:
                 val_loader: DataLoader, 
                 optimizer: Optimizer, 
                 config: dict,
-                temporal_unit: Optional[int] = 0, 
-                resume_train: Optional[bool] = False,
-                ):
+                temporal_unit: Optional[int] = 0):
         ''' Training the TS2Vec model.
         
         Args:
@@ -135,11 +133,6 @@ class TS2Vec:
         if not os.path.isdir(config['save_dir']):
             os.makedirs(config['save_dir'])
 
-        # Resume the training stoped
-        if resume_train:
-            checkpoint = torch.load(checkpoint_path, weights_only=True)
-            self.load_state_dict(checkpoint['state_dict']) 
-
         train_losses = []
         val_losses = []
 
@@ -147,8 +140,7 @@ class TS2Vec:
         best_epoch = None
         best_model_params = None
         
-        start_epoch = 0 if resume_train is False else checkpoint['epoch']-1
-        for i in range(start_epoch, config['epochs']):
+        for i in range(0, config['epochs']):
 
             # ---------------- Training phase ---------------- #
             self.train()
@@ -210,16 +202,18 @@ class TS2Vec:
 
 
             # -------------- Save checkpoint -------------- #
-            checkpoint = {'state_dict': self.net.state_dict(), 'epoch': i+1}
+            checkpoint = {
+                'state_dict': self.net.state_dict(), 
+                'optimizer': optimizer.state_dict(),
+                'epoch': i+1
+            }
             torch.save(checkpoint, checkpoint_path)
 
             running_loss /= len(val_loader)
             if running_loss < best_loss:
                 best_loss = running_loss
-                best_model_params = self.net.state_dict()
-                best_epoch = i+1
+                best_epoch = i
 
-                checkpoint = {'state_dict': best_model_params, 'epoch': best_epoch}
                 torch.save(checkpoint, f"{config['save_dir']}/{config['problem']}_pretrained_TS2Vec_best.pth")
 
             val_losses.append(running_loss)

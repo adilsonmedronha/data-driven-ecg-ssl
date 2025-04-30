@@ -1,3 +1,4 @@
+import torch
 import numpy as np
 from datetime import datetime
 import torch.optim as optim
@@ -41,12 +42,28 @@ def pre_training(config, data, resume_train = False):
     ts2vec = TS2Vec(device=config['gpu'], **config['model_args'])
     ts2vec_optim = optim.AdamW(ts2vec._net.parameters(), **config['optim_args'])
 
+
+    # load the checkpoint if resume training ---------------------------------------------
+    if resume_train:
+        logger.info("Resuming the training ...")
+        checkpoint_path = f"{config['save_dir']}/{config['old-problem']}_pretrained_{config['Model_Type']}_best.pth"
+        checkpoint = torch.load(checkpoint_path)
+        
+        logger.info(f"Loading the checkpoint from {checkpoint_path}")
+        ts2vec.load_state_dict(checkpoint['state_dict'])
+
+        # update the save_dir to save the resumed training
+        path_levels = config['save_dir'].split('/')
+        path_levels[-2] = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        config['save_dir'] = '/'.join(path_levels)
+        logger.info(f"Saving the resumed training in {config['save_dir']}")
+
+
     since = datetime.now()
     _, logs = ts2vec.fit_ssl(train_loader=train_loader, 
                                          val_loader=test_loader,
                                          optimizer=ts2vec_optim, 
-                                         config=config,
-                                         resume_train=resume_train)
+                                         config=config)
     ssl_time = datetime.now() - since
     logs['time'] = ssl_time.total_seconds()
 

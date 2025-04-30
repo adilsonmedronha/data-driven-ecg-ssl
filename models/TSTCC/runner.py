@@ -4,8 +4,6 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from Dataset.dataloader import dataset_class
-
 from .tc import TC
 from .model import BaseModel as Encoder
 from .dataloader import Load_Dataset
@@ -54,6 +52,23 @@ def pre_training(config, data, resume_train = False):
 
     encoder = Encoder(**model_args['encoder']) # feature extractor module
     encoder_optim = torch.optim.Adam(encoder.parameters(), **config['optim_args'])
+
+    # load the checkpoint if resume training ---------------------------------------------
+    if resume_train:
+        logger.info("Resuming the training ...")
+        checkpoint_path = f"{config['save_dir']}/{config['old-problem']}_pretrained_{config['Model_Type']}_last.pth"
+        checkpoint = torch.load(checkpoint_path)
+        
+        logger.info(f"Loading the checkpoint from {checkpoint_path}")
+        encoder.load_state_dict(checkpoint['encoder'])
+        tc.load_state_dict(checkpoint['tc_model'])
+
+        # update the save_dir to save the resumed training
+        path_levels = config['save_dir'].split('/')
+        path_levels[-2] = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        config['save_dir'] = '/'.join(path_levels)
+        logger.info(f"Saving the resumed training in {config['save_dir']}")
+
 
     # start training ----------------------------------------------------------------------
     since = datetime.now()
