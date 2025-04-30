@@ -103,6 +103,8 @@ class TS2Vec:
     def parameters(self):
         return self.net.parameters()
 
+    def _get_name(self):
+        return "TS2Vec"
 
     def fit_ssl(self, 
                 train_loader: DataLoader, 

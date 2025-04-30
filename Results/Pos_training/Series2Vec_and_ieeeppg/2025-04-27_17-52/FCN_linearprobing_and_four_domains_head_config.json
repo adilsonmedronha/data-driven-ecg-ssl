@@ -1,0 +1,11 @@
+{
+    "dataset": "IEEEPPG",
+    "task": "regression",
+    "layers_config": [
+        1,
+        1
+    ],
+    "batch_size": 64,
+    "gpu": 0,
+    "lr": 0.0001
+}

@@ -22,8 +22,7 @@ def choose_trainer(model, train_loader, test_loader, config, conf_mat, type):
 def pre_training(config, Data):
     logger.info("Creating Distance based Self Supervised model ...")
     model = Model_factory(config, Data)
-    optim_class = get_optimizer("RAdam")
-    config['optimizer'] = optim_class(model.parameters(), lr=config['lr'], weight_decay=0)
+    config['optimizer'] = get_optimizer("RAdam", model, config)
     config['loss_module'] = get_loss_module()
     model.to(config['gpu'])
 
@@ -43,6 +42,11 @@ def pre_training(config, Data):
     # --------------------------------- Self Superviseed Training ------------------------------------------------------
     SS_trainer = S2V_SS_Trainer(model, train_loader, test_loader, config, print_conf_mat=False)
     save_path = os.path.join(config['save_dir'], config['problem'] + '_pretrained_model_{}.pth'.format('last'))
+
+    # create the dir to save the checkpoints
+    if not os.path.isdir(config['save_dir']):
+        os.makedirs(config['save_dir'])
+
     SS_train_runner(config, model, SS_trainer, save_path)
 
     return

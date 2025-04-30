@@ -2,14 +2,10 @@ import torch.nn as nn
 
 
 class MLP(nn.Module):
-     def __init__(self, in_dim, hidden_dim, output_size):
+     def __init__(self, in_dim, hidden_dim, num_classes):
          super(MLP, self).__init__()
-         self.z1 = nn.Linear(in_dim, hidden_dim)
-         self.a1 = nn.ReLU()
-         self.z2 = nn.Linear(hidden_dim, output_size)
-         self.a2 = nn.ReLU()
      
-         self.logits = nn.Sequential(
+         self.layers = nn.Sequential(
              nn.Dropout(0.1),
              nn.Linear(in_dim, hidden_dim),
              nn.LeakyReLU(),
@@ -22,6 +18,9 @@ class MLP(nn.Module):
              nn.Dropout(0.3),
              nn.Linear(output_size, output_size)
          )
+
+         self.logits = nn.Linear(in_features=hidden_dim, out_features=num_classes if num_classes > 2 else 1)
  
      def forward(self, x):
-         return self.logits(x)
+         _x = self.layers(x)
+         return self.logits(_x)

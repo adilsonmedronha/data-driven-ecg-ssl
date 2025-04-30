@@ -6,11 +6,15 @@ Dataset/Benchmarks/WESAD_ECGonly/WESAD_ECGonly_train.pt
 Dataset/Benchmarks/**/*.pt
 
 !Dataset/dataloader.py
+!Dataset/ieeeppg.ipynb
+!Dataset/wesad.ipynb
 
 # temporary
 wandb/
 .vscode/
 summary
+nohup*.out
+Results/Pre_Training/Benchmarks
 
 
 # Byte-compiled / optimized / DLL files

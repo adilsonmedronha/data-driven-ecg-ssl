@@ -191,3 +191,4 @@ dependencies:
       - xarray==2025.3.0
       - xyzservices==2025.1.0
       - torchsummary==1.5.1
+      - nbformat>=4.2.0

@@ -1,0 +1,27 @@
+{
+    "Model_Type": "TS2Vec",
+    "Training_mode": "Pre_Training",
+    "save_dir": "Results/Pre_Training/Benchmarks/2025-04-20_16-29/checkpoints",
+    "data_dir": "Dataset/Benchmarks",
+    "seed": 1234,
+    "gpu": 0,
+    "batch_size": 16,
+    "optim_args": {
+        "lr": 0.001,
+        "betas": [
+            0.9,
+            0.999
+        ]
+    },
+    "model_args": {
+        "in_dim": 1,
+        "out_dim": 320,
+        "hidden_dim": 64,
+        "depth": 10,
+        "kernel_size": 3,
+        "dropout": 0.1,
+        "mask_mode": "binomial"
+    },
+    "epochs": 600,
+    "problem": "WESAD_ECGonly_8second"
+}
