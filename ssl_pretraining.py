@@ -53,6 +53,7 @@ if __name__ == '__main__':
     config['resume'] = args.resume
     if args.resume:
         config['old-problem'] = config['problem']
+        config['old-config'] = args.config_file
 
     dataset_list = os.listdir(config['data_dir']) if args.datasets is None else args.datasets
     # ------------------------------------------- Pretrain Series2Vec -------------------------------------------
@@ -69,10 +70,12 @@ if __name__ == '__main__':
                 
             Series2Vec_pre_training(config, Data, resume_train=args.resume)
             
-            # TODO: Save the configs to a file ---------------------------------------------------
-            # config_path = os.path.join(config['save_dir'], config['problem']+'_TS2Vec_config.json')
-            # json.dump(config, open(config_path, 'w'))
-            # print(f"Config saved to {config_path}")
+            # Save the configs to a file ---------------------------------------------------
+            config_path = os.path.join(config['save_dir'], config['problem']+'_TS2Vec_config.json')
+
+            final_dict = {k: v for k, v in config.items() if k not in ['optimizer', 'loss_module']}
+            json.dump(final_dict, open(config_path, 'w'))
+            print(f"Config saved to {config_path}")
 
 
     # ------------------------------------------- Pretrain TS2Vec -------------------------------------------
