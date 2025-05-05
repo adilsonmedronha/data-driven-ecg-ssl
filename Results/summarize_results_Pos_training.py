@@ -98,6 +98,6 @@ def main(exp_folder):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Summarize CSVs in experiment folder.')
-    parser.add_argument('exp_folder', type=str, help='Name of the experiment folder inside Pos_training/')
+    parser.add_argument('--exp_folder', type=str, help='Name of the experiment folder inside Pos_training/')
     args = parser.parse_args()
     main(args.exp_folder)
