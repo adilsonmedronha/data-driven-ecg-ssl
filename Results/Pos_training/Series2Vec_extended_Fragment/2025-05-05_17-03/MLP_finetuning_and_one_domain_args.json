@@ -1,0 +1,12 @@
+{
+    "model_name": "MLP",
+    "folder_name": "Series2Vec_extended_Fragment",
+    "description": "MLP_finetuning_and_one_domain",
+    "head_configuration_file": "Configs/MLP_headmodel.json",
+    "encoder_configuration_file": "Results/Pre_Training/S2V/2025-05-05_15-38/Fragment_after_WESAD_ECGonly_S2V_config.json",
+    "runs": 5,
+    "epochs": 300,
+    "encoder_checkpoint_path": "Results/Pre_Training/S2V/2025-05-05_15-38/checkpoints/Fragment_after_WESAD_ECGonly_pretrained_model_last.pth",
+    "is_finetuning": 1,
+    "seed": 40
+}
