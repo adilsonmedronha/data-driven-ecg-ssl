@@ -1,0 +1,13 @@
+{
+    "configs": {
+        "lr": 0.001,
+        "weight_decay": 0.001,
+        "num_epochs": 300,
+        "batch_size": 64
+    },
+    "dataset": "fragment",
+    "runs": 5,
+    "seed": 42,
+    "sequence_length": 720,
+    "output_dir": "Results/Supervised/2025-04-30_16-58"
+}

@@ -77,6 +77,7 @@ def test(model, test_loader, device, save_path, RUN_NAME='teste'):
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for dataloaders")
+    parser.add_argument("--dataset_name", type=str, default="Fragment", help="Dataset name")
     parser.add_argument("--num_epochs", type=int, default=300, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.001, help="Learning rate")
     parser.add_argument("--wdecay", type=float, default=0.001, help="Weight decay for optimizer")
@@ -116,9 +117,8 @@ def main():
 
     for idx, model in enumerate(model_params):
         set_seed(seeds[idx])
-        train_loader, val_loader, test_loader = load_task_dataset(batch_size=args.batch_size)
-        curr_model = model(**model_params[model], configs=configs, seed=seeds[idx])
-        model_name = f'{curr_model.__class__.__name__}' if isinstance(curr_model, HinceptionTime) else f'{curr_model.__class__.__name__}'  
+        train_loader, val_loader, test_loader = load_task_dataset(batch_size=args.batch_size, dataset_name=args.dataset_name)
+        model_name = model.__name__
         print(model_name)
         curr_run_output_dir = os.path.join(run_output_dir, model_name)
         os.makedirs(curr_run_output_dir, exist_ok=True)
@@ -131,6 +131,7 @@ def main():
             df.to_csv(csv_path, mode='w', header=True, index=False)
 
         for run_idx in range(args.runs):
+            curr_model = model(**model_params[model], configs=configs, seed=seeds[idx])
             print(f' TRAINING {curr_model.__class__.__name__}')
             curr_model.run(train_loader, val_loader, args.num_epochs, device, run_idx=run_idx, path=curr_run_output_dir)
             curr_model.to(device)
