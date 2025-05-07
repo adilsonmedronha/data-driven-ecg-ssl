@@ -22,10 +22,10 @@ def including_task_dataset(config, task_dataset, Data):
 
     logger.info(f"Including task dataset '{args.task_dataset}' during the pretraining")
     Data['train_data'] = np.concat((Data['train_data'], train_loader.dataset.tensors[0].numpy()), axis=0)
-    Data['train_label'] = np.zeros((Data['train_data'].shape[0],1)) # ingnore the labels
+    Data['train_label'] = np.concat((Data['train_label'], train_loader.dataset.tensors[1].numpy()), axis=0)
 
     Data['test_data'] = np.concat((Data['test_data'], val_loader.dataset.tensors[0].numpy()), axis=0)
-    Data['test_label'] = np.zeros((Data['test_data'].shape[0],1)) # ingnore the labels
+    Data['test_label'] = np.concat((Data['test_label'], val_loader.dataset.tensors[1].numpy()), axis=0)
 
     logger.info(f"  - Inserted {train_loader.dataset.tensors[0].shape[0]} training samples from task dataset")
     logger.info(f"  - Inserted {val_loader.dataset.tensors[0].shape[0]} testing samples from task dataset")
@@ -67,6 +67,7 @@ if __name__ == '__main__':
             # include the task dataset during the pretraining
             if args.task_dataset is not None:
                 Data = including_task_dataset(config, args.task_dataset, Data)
+                config['problem'] = f"{config['problem']}+{args.task_dataset}"
                 
             Series2Vec_pre_training(config, Data, resume_train=args.resume)
             
@@ -90,6 +91,7 @@ if __name__ == '__main__':
             # include the task dataset during the pretraining
             if args.task_dataset is not None:
                 Data = including_task_dataset(config, args.task_dataset, Data)
+                config['problem'] = f"{config['problem']}+{args.task_dataset}"
 
             updated_config, logs = TS2Vec_pre_training(config, Data, resume_train=args.resume)
 
@@ -116,6 +118,7 @@ if __name__ == '__main__':
             # include the task dataset during the pretraining
             if args.task_dataset is not None:
                 Data = including_task_dataset(config, args.task_dataset, Data)
+                config['problem'] = f"{config['problem']}+{args.task_dataset}"
 
             updated_config, logs = TSTCC_pre_training(config, Data, resume_train=args.resume)
 
