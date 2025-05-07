@@ -72,7 +72,7 @@ if __name__ == '__main__':
             Series2Vec_pre_training(config, Data, resume_train=args.resume)
             
             # Save the configs to a file ---------------------------------------------------
-            config_path = os.path.join(config['save_dir'], config['problem']+'_TS2Vec_config.json')
+            config_path = os.path.join(config['save_dir'], config['problem']+'_S2V_config.json')
 
             final_dict = {k: v for k, v in config.items() if k not in ['optimizer', 'loss_module']}
             json.dump(final_dict, open(config_path, 'w'))
