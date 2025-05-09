@@ -126,7 +126,7 @@ if __name__ == '__main__':
     
     # ----------------------------------------------- Run the experiment -----------------------------------------------
     # Load Target dataset
-    train_loader, val_loader, test_loader = load_task_dataset(batch_size = 64, dataset_name = head_config['dataset'])
+    train_loader, val_loader, test_loader = load_task_dataset(head_config['batch_size'], head_config['dataset'])
 
     path2load_encoder = os.path.join(args.encoder_checkpoint_path)
     DataWhereS2VwereTrained = dataloader.data_loader(encoder_config)

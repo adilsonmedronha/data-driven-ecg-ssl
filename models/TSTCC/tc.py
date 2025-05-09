@@ -225,20 +225,21 @@ class TC(nn.Module):
 
 
             # -------------- Save models parameters -------------- #
+            # TODO: Save the optimizer states
             checkpoint = {
                 'encoder': encoder.state_dict(),
+                'encoder_optim': encoder_optim.state_dict(),
                 'tc_model': self.state_dict(),
+                'tc_optim': tc_optim.state_dict(),
                 'epoch': i
             }
             torch.save(checkpoint, checkpoint_path)
 
+            # save the best model
             if val_loss < best_loss:
                 best_loss = val_loss
-                best_encode_params = encoder.state_dict()
                 best_epoch = i
-
-                # save the best model
-                checkpoint = {'state_dict': best_encode_params, 'epoch': best_epoch}
+                
                 torch.save(checkpoint, f"{config['save_dir']}/{config['problem']}_pretrained_TSTCC_best.pth")
             
 

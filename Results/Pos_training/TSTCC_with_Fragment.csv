@@ -1,0 +1,9 @@
+model,dataset,avg_loss,acc,acc_std,f1,f1_std,recall,recall_std,precision,precision_std
+MLP_linearprobing_and_one_domain,Fragment,0.627,0.6065,0.0178,0.4936,0.0203,0.627,0.0181,1.0072,0.0205
+MLP_linearprobing_and_four_domains,Fragment,0.4945,0.4778,0.0246,0.3436,0.0256,0.4945,0.0251,1.0575,0.0468
+FCN_finetuning_and_four_domains,Fragment,0.2957,0.2,0.1063,0.1292,0.0711,0.2957,0.1087,1.8465,0.1033
+FCN_linearprobing_and_one_domain,Fragment,0.2724,0.1934,0.0983,0.1308,0.1147,0.2724,0.0784,1.6387,0.0202
+FCN_linearprobing_and_four_domains,Fragment,0.2847,0.1906,0.0511,0.1478,0.0617,0.2847,0.0501,1.6622,0.0357
+MLP_finetuning_and_one_domain,Fragment,0.1706,0.0597,0.0182,0.0587,0.0153,0.1706,0.011,4.651,1.5541
+FCN_finetuning_and_one_domain,Fragment,0.1497,0.0591,0.0153,0.0548,0.0125,0.1497,0.0148,1.8337,0.0243
+MLP_finetuning_and_four_domains,Fragment,0.1509,0.0556,0.0194,0.0586,0.0146,0.1509,0.0399,6.6174,1.2236

@@ -1,0 +1,48 @@
+{
+    "Model_Type": "TSTCC",
+    "Training_mode": "Pre_Training",
+    "save_dir": "Results/Pre_Training/TSTCC/2025-05-07_16-55/checkpoints",
+    "data_dir": "Dataset/Benchmarks",
+    "seed": 1234,
+    "gpu": 0,
+    "batch_size": 64,
+    "optim_args": {
+        "lr": 0.0003,
+        "betas": [
+            0.9,
+            0.999
+        ],
+        "weight_decay": 0.0003
+    },
+    "model_args": {
+        "encoder": {
+            "in_dim": 1,
+            "out_dim": 320,
+            "kernel_size": 8,
+            "stride": 1,
+            "dropout": 0.35
+        },
+        "tc_model": {
+            "hidden_dim": 64,
+            "out_dim": 320,
+            "timesteps": 30
+        },
+        "cc_loss": {
+            "cc_temp": 0.2,
+            "use_cosine": true
+        },
+        "augmentation": {
+            "jitter_scale": 2,
+            "jitter_ratio": 0.38,
+            "max_seg": 12
+        }
+    },
+    "epochs": 60,
+    "problem": "Fragment",
+    "datasets": [
+        "WESAD_no_ecg"
+    ],
+    "resume": true,
+    "old-problem": "WESAD_no_ecg",
+    "old-config": "Results/Pre_Training/TSTCC/2025-04-30_16-21/WESAD_no_ecg_TSTCC_config.json"
+}

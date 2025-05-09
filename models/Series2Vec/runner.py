@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from models.model_factory import Model_factory
 from models.optimizers import get_optimizer, get_loss_module
 from torch.utils.data import DataLoader
@@ -19,12 +20,28 @@ def choose_trainer(model, train_loader, test_loader, config, conf_mat, type):
     return S_trainer
 
 
-def pre_training(config, Data):
+def pre_training(config, Data, resume_train=False):
     logger.info("Creating Distance based Self Supervised model ...")
     model = Model_factory(config, Data)
     config['optimizer'] = get_optimizer("RAdam", model, config)
     config['loss_module'] = get_loss_module()
     model.to(config['gpu'])
+
+    # load the checkpoint if resume training ---------------------------------------------
+    if resume_train:
+        logger.info("Resuming the training ...")
+        checkpoint_path = f"{config['save_dir']}/{config['old-problem']}_pretrained_model_last.pth"
+        checkpoint = torch.load(checkpoint_path)
+        
+        logger.info(f"Loading the checkpoint from {checkpoint_path}")
+        model.load_state_dict(checkpoint['state_dict'])
+
+        # update the save_dir to save the resumed training
+        path_levels = config['save_dir'].split('/')
+        path_levels[-2] = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        config['save_dir'] = '/'.join(path_levels)
+        logger.info(f"Saving the resumed training in {config['save_dir']}")
+
 
     # --------------------------------- Load Data ---------------------------------------------------------------------
     train_dataset = dataset_class(Data['train_data'], Data['train_label'], config)

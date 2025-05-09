@@ -1,7 +1,7 @@
 {
-    "dataset": "IEEEPPG",
-    "task": "regression",
-    "layers_config": [640, 500, 1], 
+    "dataset": "Fragment",
+    "task": "classification",
+    "layers_config": [640, 500, 6], 
     "batch_size": 64,
     "gpu": 0,
     "lr": 0.0001

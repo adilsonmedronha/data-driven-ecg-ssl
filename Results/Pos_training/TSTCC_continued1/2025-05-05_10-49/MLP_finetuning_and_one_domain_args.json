@@ -1,0 +1,12 @@
+{
+    "model_name": "MLP",
+    "folder_name": "TSTCC_no_ecg_Fragment",
+    "description": "MLP_finetuning_and_one_domain",
+    "head_configuration_file": "Configs/MLP_headmodel.json",
+    "encoder_configuration_file": "Results/Pre_Training/TSTCC/2025-04-30_16-21/WESAD_no_ecg_TSTCC_config.json",
+    "runs": 5,
+    "epochs": 300,
+    "encoder_checkpoint_path": "Results/Pre_Training/TSTCC/2025-04-30_16-21/checkpoints/WESAD_no_ecg_pretrained_TSTCC_last.pth",
+    "is_finetuning": 1,
+    "seed": 40
+}

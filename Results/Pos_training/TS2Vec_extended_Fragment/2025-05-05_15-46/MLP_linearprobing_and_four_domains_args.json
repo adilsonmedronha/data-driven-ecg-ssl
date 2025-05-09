@@ -1,0 +1,12 @@
+{
+    "model_name": "MLP",
+    "folder_name": "TS2Vec_extended_Fragment",
+    "description": "MLP_linearprobing_and_four_domains",
+    "head_configuration_file": "Configs/MLP_headmodel.json",
+    "encoder_configuration_file": "Results/Pre_Training/TS2Vec/2025-05-05_15-10/Fragment_after_WESAD_TS2Vec_config.json",
+    "runs": 5,
+    "epochs": 300,
+    "encoder_checkpoint_path": "Results/Pre_Training/TS2Vec/2025-05-05_15-10/checkpoints/Fragment_after_WESAD_pretrained_TS2Vec_best.pth",
+    "is_finetuning": 0,
+    "seed": 10
+}

@@ -71,9 +71,9 @@ def numpy_loader(config):
         Data['test_label'] = Data_test['labels'].numpy()
         
         Data['max_len'] = Data['train_data'].shape[2]
-        
-        logger.info(f"{len(Data['train_data'])} samples will be used for training")
+
         samples, channels, time_steps = Data['train_data'].shape
+        logger.info(f"{samples} samples will be used for training")
         logger.info(f"Train Data Shape: {samples} samples, {channels} channels, {time_steps} time steps")
         logger.info(f"{len(Data['test_label'])} samples will be used for testing")
     else:
