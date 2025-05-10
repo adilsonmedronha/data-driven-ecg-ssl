@@ -3,11 +3,12 @@ import torch
 import torch.nn.functional as F
 import wandb
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-from sklearn.metrics import confusion_matrix
+from mine_utils import set_seed
 
 class MLP(nn.Module):
     def __init__(self, in_dim, hidden_dim, output_size, configs, seed):
         super(MLP, self).__init__()
+        set_seed(seed)
         self.logits = nn.Sequential(
             nn.Dropout(0.1),
             nn.Linear(in_dim, hidden_dim),

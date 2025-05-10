@@ -206,7 +206,8 @@ class HinceptionTime(nn.Module):
         self.seed = seed
         self.models = []
         for idx in range(self.num_models):
-            set_seed((self.seed + idx) * 50)
+            print(self.seed, self.seed + idx + 1)
+            set_seed(self.seed + idx + 1)
             model = Hinception(sequence_length=sequence_length, in_channels=in_channels, num_classes=num_classes, hname=f'H{idx+1}')
             self.models.append(model)
         self.setup(configs)
