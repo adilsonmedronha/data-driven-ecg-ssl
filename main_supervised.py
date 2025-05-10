@@ -77,6 +77,7 @@ def test(model, test_loader, device, save_path, RUN_NAME='teste'):
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for dataloaders")
+    parser.add_argument("--dataset_name", type=str, default="Fragment", help="Dataset name")
     parser.add_argument("--num_epochs", type=int, default=300, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.001, help="Learning rate")
     parser.add_argument("--wdecay", type=float, default=0.001, help="Weight decay for optimizer")
@@ -92,11 +93,14 @@ def main():
     initial_timestamp = datetime.now()
     run_output_dir = os.path.join(args.output_dir, initial_timestamp.strftime("%Y-%m-%d_%H-%M"))
     os.makedirs(run_output_dir, exist_ok=True)
+    model_params = {  FCN: {'in_dim': 1, 'num_classes': 6},
+                      MLP: {'in_dim': 720, 'hidden_dim': 500, 'output_size': 6},
+                      HinceptionTime: {'sequence_length': 720, 'in_channels': 1, 'num_classes': 6}  }
     device = 'cuda'
-    n_models = 5
+    n_models = len(model_params)
     n_seeds = args.runs * n_models 
-    seeds = np.arange(n_seeds) + args.seed
-
+    seeds = [i*args.runs for i in range(n_seeds)]
+    print(seeds)
     configs = {
         'lr': args.lr,
         'weight_decay': args.wdecay,
@@ -107,18 +111,13 @@ def main():
         'loss': nn.CrossEntropyLoss(),
         'optimizer': torch.optim.Adam,
     }
-
     print(configs)
-    model_params = {  HinceptionTime: {'sequence_length': 720, 'in_channels': 1, 'num_classes': 6},
-                      FCN: {'in_dim': 1, 'num_classes': 6},
-                      MLP: {'in_dim': 720, 'hidden_dim': 500, 'output_size': 6}  }
-    
 
+    
+    run_ = 0
     for idx, model in enumerate(model_params):
-        set_seed(seeds[idx])
-        train_loader, val_loader, test_loader = load_task_dataset(batch_size=args.batch_size)
-        curr_model = model(**model_params[model], configs=configs, seed=seeds[idx])
-        model_name = f'{curr_model.__class__.__name__}' if isinstance(curr_model, HinceptionTime) else f'{curr_model.__class__.__name__}'  
+        train_loader, val_loader, test_loader = load_task_dataset(batch_size=args.batch_size, dataset_name=args.dataset_name)
+        model_name = model.__name__
         print(model_name)
         curr_run_output_dir = os.path.join(run_output_dir, model_name)
         os.makedirs(curr_run_output_dir, exist_ok=True)
@@ -131,6 +130,7 @@ def main():
             df.to_csv(csv_path, mode='w', header=True, index=False)
 
         for run_idx in range(args.runs):
+            curr_model = model(**model_params[model], configs=configs, seed=seeds[run_])
             print(f' TRAINING {curr_model.__class__.__name__}')
             curr_model.run(train_loader, val_loader, args.num_epochs, device, run_idx=run_idx, path=curr_run_output_dir)
             curr_model.to(device)
@@ -146,6 +146,7 @@ def main():
                 "precision": [results['precision']],
             })
             df.to_csv(csv_path, mode='a', header=False, index=False)
+            run_ += 1
         wandb.finish()
 
     configs_bkp = configs.copy()

@@ -2,13 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import wandb
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score
+from mine_utils import set_seed
 
 class FCN(nn.Module):
 
     def __init__(self, in_dim: int, num_classes: int, configs, seed) -> None:
         super().__init__()
+        set_seed(seed)
         
         self.num_classes = num_classes
 

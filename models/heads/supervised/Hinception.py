@@ -4,7 +4,7 @@ from typing import Tuple
 import numpy as np
 from torch.nn import functional as F
 import wandb
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, f1_score
 from mine_utils import set_seed
 
 def noop(x: torch.Tensor) -> torch.Tensor:
@@ -204,11 +204,12 @@ class HinceptionTime(nn.Module):
         super().__init__()
         self.num_models = num_models
         self.seed = seed
-        self.models = nn.ModuleList([
-            Hinception(sequence_length=sequence_length, in_channels=in_channels, num_classes=num_classes, hname=f'H{idx+1}')
-            for idx in range(self.num_models)
-        ])
-
+        self.models = []
+        for idx in range(self.num_models):
+            print(self.seed, self.seed + idx + 1)
+            set_seed(self.seed + idx + 1)
+            model = Hinception(sequence_length=sequence_length, in_channels=in_channels, num_classes=num_classes, hname=f'H{idx+1}')
+            self.models.append(model)
         self.setup(configs)
 
     def setup(self, configs: dict) -> None:
@@ -257,4 +258,4 @@ class HinceptionTime(nn.Module):
                     })
                 
                 inception.load_state_dict(torch.load(best_model_path))
-                torch.save(self.state_dict(), f'{path}/run_{run_idx+1}_HinceptionTime_merged_best_individuals_inceptions.pth')
+                torch.save(self.state_dict(), f'{path}/run_{run_idx+1}_HinceptionTime_best_individuals_inceptions.pth')
