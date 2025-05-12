@@ -1,0 +1,4 @@
+model,dataset,avg_loss,acc,acc_std,f1,f1_std,recall,recall_std,precision,precision_std
+HinceptionTime,fragment,,0.5804,0.0399,0.5561,0.0334,0.5804,0.0399,0.5495,0.033
+MLP,fragment,,0.4209,0.0266,0.3733,0.0184,0.4209,0.0266,0.3629,0.0313
+FCN,fragment,,0.3337,0.0596,0.2345,0.0398,0.3337,0.0596,0.2429,0.052

@@ -88,7 +88,7 @@ def generate_csv(exp_folder, exp_name):
 
     combined_df = pd.concat(all_data, ignore_index=True)
     combined_df.sort_values(by=sort_by, ascending=ascending, inplace=True)
-    combined_df.to_csv(f'Pos_training/{exp_name}.csv', index=False)
+    combined_df.to_csv(f'{exp_folder}/{exp_name}.csv', index=False)
 
 def main(exp_folder):
     for folder_name in os.listdir(exp_folder):
