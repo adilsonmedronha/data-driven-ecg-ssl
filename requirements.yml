@@ -1,4 +1,4 @@
-name: ssl-multidomain
+name: ecg-ssl
 channels:
   - conda-forge
   - defaults
