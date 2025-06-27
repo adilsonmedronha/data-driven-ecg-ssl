@@ -38,14 +38,16 @@ def run(run_idx, epochs, head_model, ssl_model, head_optimizer,
         filename=f"UMAP_encoder_before_{RUN_NAME}",
         title=f"UMAP SSL BEFORE {RUN_NAME}",
     )
-
+    train_losses = []
+    val_losses = []
     for epoch in range(epochs): 
         train_loss = task_trainer.train(head_model,
                            ssl_model, 
                            head_optimizer, 
                            ssl_optimizer, loss_module, train_loader, device, is_finetuning)
         avg_val_loss, val_loss = task_trainer.val(head_model, ssl_model, val_loader, loss_module, device)
-
+        train_losses.append(train_loss)
+        val_losses.append(avg_val_loss)
         wandb.log({
             f"train_loss/run_{run_idx}": train_loss,
             f"avg_val_loss/run_{run_idx}": avg_val_loss,
@@ -83,7 +85,18 @@ def run(run_idx, epochs, head_model, ssl_model, head_optimizer,
     wandb.log({"umap_before": fig_umap_before, 
                "umap_after": fig_umap_after, 
                "umap_mlp_after": fig_umap_mlp_after})
+    
 
+    losses_json = { 'train_loss': train_losses, 'val_loss': val_losses }
+    save_json(losses_json, os.path.join(save_path, f"train_val_loss_{epochs}_eps_run_{run_idx}.json"))
+
+    task_trainer.plot_train_and_val_loss(
+        train_loss=train_losses,
+        val_loss=val_losses,
+        save_path=save_path,
+        filename=f"train_val_loss_{epochs}_epochs_{run_idx}",
+        title=f"Train and Val Loss {epochs} epochs {run_idx}",
+    )
     return {
         "best_avg_val_loss": best_avg_val_loss,
         "best_head_model": best_head_model,
@@ -135,7 +148,6 @@ if __name__ == '__main__':
     seeds = [args.seed + i for i in range(N_EXPERIMENTS)]
     for run_idx in range(N_EXPERIMENTS):
         set_seed(seeds[run_idx])
-
         # Load SSL model -------------------------------------------------
         model = Model_factory(encoder_config, DataWhereS2VwereTrained)
         encoder_config['optimizer'] = get_optimizer("RAdam", model, encoder_config)
@@ -176,9 +188,12 @@ if __name__ == '__main__':
 
     # save the best model among the five runs
     best_ssl_and_head = min(models, key=lambda x: x['best_avg_val_loss'])
+    #print(best_ssl_and_head['best_ssl_model'].state_dict().keys(), len(best_ssl_and_head['best_ssl_model'].state_dict().keys()))
 
     torch.save(best_ssl_and_head['best_head_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_best_head_model_across_all_loss_validation.pth'))
     torch.save(best_ssl_and_head['best_ssl_model'].state_dict(), os.path.join(output_dir, f'{RUN_NAME}_best_ssl_model_weights.pth'))
+
+    #print(len(torch.load(os.path.join(output_dir, f'{RUN_NAME}_best_ssl_model_weights.pth')).keys()))
 
     # save the config files 
     save_json(head_config, os.path.join(output_dir, f'{RUN_NAME}_head_config.json'))

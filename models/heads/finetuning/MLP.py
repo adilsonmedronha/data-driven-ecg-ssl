@@ -16,7 +16,7 @@ class MLP(nn.Module):
              nn.Linear(hidden_dim, hidden_dim),
              nn.LeakyReLU(),
              nn.Dropout(0.3),
-             nn.Linear(output_size, output_size)
+             nn.Linear(hidden_dim, hidden_dim)
          )
 
          self.logits = nn.Linear(in_features=hidden_dim, out_features=num_classes if num_classes > 2 else 1)

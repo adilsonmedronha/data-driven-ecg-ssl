@@ -1,0 +1,12 @@
+{
+    "model_name": "FCN",
+    "folder_name": "Overfitting",
+    "description": "FCN_linearprobing_and_one_domain",
+    "head_configuration_file": "Configs/FCN_headmodel.json",
+    "encoder_configuration_file": "Results/Pre_Training/TS2Vec/2025-05-06_16-30/WESAD_continued30_TS2Vec_config.json",
+    "runs": 5,
+    "epochs": 300,
+    "encoder_checkpoint_path": "Results/Pre_Training/TS2Vec/2025-05-06_16-30/checkpoints/WESAD_continued30_pretrained_TS2Vec_best.pth",
+    "is_finetuning": 0,
+    "seed": 30
+}

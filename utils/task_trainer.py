@@ -31,7 +31,6 @@ def train(head_model, ssl_model, head_optimizer, ssl_optimizer, loss_module, tra
         
         with torch.set_grad_enabled(is_finetuning):
             z_emb = ssl_model.linear_prob(x)
-            
         y_hat = head_model(z_emb)
         loss = loss_module(y_hat, y)
         loss.backward()
@@ -152,6 +151,17 @@ def _regression_metrics(all_labels, all_preds, save_path, run_name):
 
     return results
 
+def plot_train_and_val_loss(train_loss, val_loss, save_path, filename, title):
+    plt.figure(figsize=(10, 8))
+    plt.plot(train_loss, label='Train Loss', color='blue')
+    plt.plot(val_loss, label='Validation Loss', color='orange')
+    plt.title('Train and Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.title(title)
+    plt.savefig(os.path.join(save_path, f"train_val_loss_{filename}.pdf"))
+    plt.close()
 
 def plot_embedding_with_umap(ssl_model, train_loader, device, save_path, filename, title, head_model=None):
 
@@ -168,4 +178,4 @@ def plot_embedding_with_umap(ssl_model, train_loader, device, save_path, filenam
                                 name = title,
                                 save_path = os.path.join(save_path, f"{filename}.pdf"))
     
-    return fig_umap
+    return fig_umap#, umap_embed, labels

@@ -62,7 +62,7 @@ def plot_umap(embedding, train_labels, name, save_path="umap_plot.pdf"):
     plt.savefig(save_path, format='pdf', bbox_inches='tight')  # Save as PDF
     plt.close(fig)
 
-    wandb.log({f'{name}': fig})  # Log the saved PDF
+    #wandb.log({f'{name}': fig})  # Log the saved PDF
     return fig
     
 
@@ -160,7 +160,6 @@ def parser_to_json(output_path, parser):
 
 
 def load_task_dataset(batch_size, dataset_name):
-
     if dataset_name == 'Fragment':
         train_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/train.pt')
         test_data = torch.load('Dataset/Fragment/ecg-fragment_360hz/test.pt')
@@ -170,7 +169,6 @@ def load_task_dataset(batch_size, dataset_name):
         train_data = torch.load(f'Dataset/{dataset_name}/train.pt', weights_only=False)
         test_data = torch.load(f'Dataset/{dataset_name}/test.pt', weights_only=False)
         val_data = torch.load(f'Dataset/{dataset_name}/val.pt', weights_only=False)
-
 
     train_loader = DataLoader(TensorDataset(train_data['samples'], train_data['labels']),
                               batch_size, shuffle=False)
