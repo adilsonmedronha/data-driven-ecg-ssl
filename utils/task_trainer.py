@@ -178,4 +178,4 @@ def plot_embedding_with_umap(ssl_model, train_loader, device, save_path, filenam
                                 name = title,
                                 save_path = os.path.join(save_path, f"{filename}.pdf"))
     
-    return fig_umap#, umap_embed, labels
+    return fig_umap, umap_embed, labels
